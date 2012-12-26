@@ -6,7 +6,7 @@
  *
  **/
 
-class AdvertisementDecorator extends SiteTreeDecorator {
+class AdvertisementDecorator extends SiteTreeExtension {
 
 
 	public static function add_requirements($alternativeFileLocation = null) {
@@ -26,20 +26,18 @@ class AdvertisementDecorator extends SiteTreeDecorator {
 		Requirements::themedCSS("Advertisements");
 	}
 
-	function extraStatics() {
-		return array(
-			'db' => array(
-				"UseParentAdvertisements" => "Boolean"
-			),
-			'has_one' => array(
-				"AdvertisementsFolder" => "Folder",
-				"AdvertisementStyle" => "AdvertisementStyle"
-			),
-			'many_many' => array(
-				"Advertisements" => "Advertisement"
-			)
-		);
-	}
+	static $db = array(
+		"UseParentAdvertisements" => "Boolean"
+	);
+
+	static $has_one = array(
+		"AdvertisementsFolder" => "Folder",
+		"AdvertisementStyle" => "AdvertisementStyle"
+	);
+
+	static $many_many = array(
+		"Advertisements" => "Advertisement"
+	);
 
 	protected static $use_custom_javascript = false;
 		static function set_use_custom_javascript($b){self::$use_custom_javascript = $b;}
@@ -64,7 +62,7 @@ class AdvertisementDecorator extends SiteTreeDecorator {
 
 	protected static $advertisements_dos;
 
-	public function updateCMSFields(FieldSet &$fields) {
+	public function updateCMSFields(FieldList $fields) {
 		if($this->classHasAdvertisements($this->owner->ClassName)) {
 			$tabName = $this->MyTabName();
 			//advertisements shown...
