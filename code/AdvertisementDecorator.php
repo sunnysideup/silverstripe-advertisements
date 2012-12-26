@@ -23,7 +23,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$file = "advertisements/javascript/AdvertisementsExecutive.js";
 		}
 		Requirements::javascript($file);
-		Requirements::themedCSS("Advertisements");
+		Requirements::themedCSS("Advertisements", "advertisements");
 	}
 
 	static $db = array(
