@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe/advertisements",
+	"name": "sunnysideup/advertisements",
 	"type": "silverstripe-module",
 	"description": "Uses the jQuery extension cycle to create advertisements ",
 	"homepage": "http://www.silverstripe-webdevelopment.com",
