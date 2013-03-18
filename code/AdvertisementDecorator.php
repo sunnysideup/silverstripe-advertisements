@@ -66,11 +66,11 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		if($this->classHasAdvertisements($this->owner->ClassName)) {
 			$tabName = $this->MyTabName();
 			//advertisements shown...
-			$where = '';
+			$where = '1 = 1';
 			if($this->owner->AdvertisementsFolderID) {
-				$images = DataObject::get("Image", "ParentID = ".$this->owner->AdvertisementsFolderID);
-				if($images) {
-					$where = "\"AdvertisementImageID\" IN (".implode(",", $images->map("ID", "ID")).")";
+				$images = Image::get()->filter("ParentID", $this->owner->AdvertisementsFolderID);
+				if($images->count()) {
+					$where = "\"AdvertisementImageID\" IN (".implode(",", $images->column("ID")).")";
 				}
 				else {
 					$where = " 1 = 2";
@@ -89,12 +89,14 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				Advertisement::recommended_image_size_statement(),
 				Advertisement::$singular_name
 			);
-			$fields->addFieldToTab($tabName, new TreeDropdownField( 'AdvertisementsFolderID', $txt, 'Folder'));
+			if(Folder::get()->count()) {
+				$fields->addFieldToTab($tabName, new TreeDropdownField( 'AdvertisementsFolderID', $txt, 'Folder'));
+			}
 			//$advertisementsCount = DB::query("SELECT COUNT(ID) FROM \"Advertisement\" $whereDB ;")->value();
-			$advertisements = DataObject::get("Advertisement", $where);
+			$advertisements = Advertisement::get()->where($where);
 			$txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Advertisement::$plural_name);
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
-			if($advertisements) {
+			if($advertisements->count()) {
 				$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... (list below shows all slides available, but on the ticked ones are shown.)'), Advertisement::$plural_name);
 				$fields->addFieldToTab($tabName, new CheckboxSetField("Advertisements", $txt, $advertisements->map("ID", "FullTitle")));
 				if(class_exists("DataObjectSorterController")) {
@@ -120,7 +122,8 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				$txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Advertisement::$plural_name, $parent->Title);
 				$fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", $txt));
 			}
-			if($styles = DataObject::get("AdvertisementStyle")) {
+			$styles = AdvertisementStyle::get();
+			if($styles->count()) {
 				$fields->addFieldToTab($tabName, $this->MyHeaderField("Style"));
 				$list = $styles->map("ID", "Title",$emptyString = _t("AdvertisementDecorator.SELECTSTYLE", "--select style--"), $sortByTitle = true);
 				$fields->addFieldToTab($tabName, new DropdownField("AdvertisementStyleID", _t("AdvertisementDecorator.STYLECREATED", "Select style (styles are created by your developer)"), $list));
@@ -184,7 +187,6 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		}
 	}
 
-
 	protected function advertisementParent() {
 		$parent = null;
 		if($this->owner->ParentID) {
@@ -230,13 +232,10 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			}
 			//check if a folder has been set and create objects
 			if($this->owner->AdvertisementsFolderID) {
-				$dos2 = DataObject::get(
-					"Image",
-					"\"File\".\"ParentID\" = ".$this->owner->AdvertisementsFolderID." AND \"Advertisement\".\"AdvertisementImageID\" IS NULL ",
-					"",
-					"LEFT JOIN \"Advertisement\" ON \"Advertisement\".\"AdvertisementImageID\" = \"File\".\"ID\" "
-				);
-				if($dos2) {
+				$dos2 = Image::get()
+					->where("\"File\".\"ParentID\" = ".$this->owner->AdvertisementsFolderID." AND \"Advertisement\".\"AdvertisementImageID\" IS NULL ")
+					->LeftJoin("Advertisement",  "\"Advertisement\".\"AdvertisementImageID\" = \"File\".\"ID\" ");
+				if($dos2->count()) {
 					$advertisementsToAdd = array();
 					foreach($dos2 as $image) {
 						$newAdvertisement = new Advertisement();
@@ -250,7 +249,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				}
 			}
 			if($this->owner->AdvertisementStyleID) {
-				if(!DataObject::get_by_id("AdvertisementStyle",$this->owner->AdvertisementStyleID)) {
+				if(!AdvertisementStyle::get()->byID($this->owner->AdvertisementStyleID)) {
 					$this->owner->AdvertisementStyleID = 0;
 				}
 			}
@@ -269,10 +268,9 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		}
 	}
 
-
 	public function advertisementsToShow() {
 		if($this->owner->UseParentAdvertisements) {
-			$parent = $this->advertisementParent();
+			$parent = $this->owner->advertisementParent();
 			if($parent) {
 				return $parent->advertisementsToShow();
 			}
@@ -280,9 +278,11 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		return $this->owner->Advertisements();
 	}
 
+	/*
 	protected function getResizedAdvertisements(){
 
 	}
+	*/
 
 	protected function classHasAdvertisements($className) {
 		//assumptions:

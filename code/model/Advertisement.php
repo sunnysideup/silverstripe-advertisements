@@ -19,7 +19,7 @@ class Advertisement extends DataObject {
 		static function set_height($i) {self::$height = $i;}
 		static function get_height() {return self::$height;}
 
-	protected static $resize_images = false;
+	protected static $resize_images = true;
 		static function set_resize_images($b) {self::$resize_images = $b;}
 		static function get_resize_images() {return self::$resize_images;}
 
@@ -182,7 +182,7 @@ class Advertisement extends DataObject {
 
 	public function requireDefaultRecords() {
 		parent::requireDefaultRecords();
-		DB::query("UPDATE Advertisement SET Title = ID WHERE Title = '' OR Title IS NULL;");
+		DB::query("UPDATE \"Advertisement\" SET \"Title\" = \"ID\" WHERE \"Title\" = '' OR \"Title\" IS NULL;");
 	}
 
 
@@ -214,9 +214,9 @@ class Advertisement extends DataObject {
 		$resizedImage = null;
 		$imageID = intval($this->AdvertisementImageID+ 0);
 		if($imageID) {
-			$imageObject = DataObject::get_by_id("Image", $imageID);
-			$resizedImage = $imageObject;
 			if(self::$resize_images) {
+				$imageObject = Image::get()->byID($imageID);
+				$resizedImage = $imageObject;
 				if($imageObject) {
 					if($imageObject->ID) {
 						$imageObject->Title = Convert::raw2att($this->Title);
@@ -242,6 +242,9 @@ class Advertisement extends DataObject {
 				else {
 					//debug::show("could not find image");
 				}
+			}
+			else {
+				return $this->AdvertisementImage();
 			}
 		}
 		else {

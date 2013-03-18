@@ -15,5 +15,6 @@ class AdvertisementAdmin extends ModelAdmin {
 
 	public static $menu_title = 'Ads / Slides';
 		static function set_menu_title($v) {self::$menu_title = $v;}
+
 }
 

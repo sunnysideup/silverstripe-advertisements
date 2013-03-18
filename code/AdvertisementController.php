@@ -10,7 +10,7 @@ class AdvertisementController extends Controller {
 
 	function removealladvertisements($request) {
 		$id = intval($request->param("ID"))-0;
-		$page = DataObject::get_by_id("SiteTree", $id);
+		$page = SiteTree::get()->byID($id);
 		if(!$page) {
 			return "this page does not exist";
 		}
@@ -25,7 +25,7 @@ class AdvertisementController extends Controller {
 	}
 
 	function deletealladvertisements($request) {
-		DB::query("DELETE FROM Advertisement");
+		DB::query("DELETE FROM \"Advertisement\"");
 		LeftAndMain::ForceReload();
 		return sprintf(
 			_t("AdvertisementController.DELETEDALL", 'Deleted all %1$s from this website, please reload page to see results.')

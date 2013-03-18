@@ -67,7 +67,7 @@ class AdvertisementStyle extends DataObject {
 			if(is_array($a)) {
 				if(count($a)) {
 					foreach($a as $k => $v) {
-						if(!DataObject::get("AdvertisementStyle", "Title = '".$k."' OR FileLocation = '".$v."'")) {
+						if(!AdvertisementStyle::get()->where("Title = '".$k."' OR FileLocation = '".$v."'")->First()) {
 							$o = new AdvertisementStyle();
 							$o->Title = $k;
 							$o->FileLocation = $v;
