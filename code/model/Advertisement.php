@@ -7,7 +7,7 @@
 
 class Advertisement extends DataObject {
 
-	protected static $thumbnail_size = 70;
+	protected static $thumbnail_size = 140;
 		static function set_thumbnail_size($i) {self::$thumbnail_size = $i;}
 		static function get_thumbnail_size() {return self::$thumbnail_size;}
 
