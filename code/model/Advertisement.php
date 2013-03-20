@@ -116,7 +116,7 @@ class Advertisement extends DataObject {
 				}
 			}
 		}
-		return DBField::create("HTMLText", $s);
+		return DBField::create_field("HTMLText", $s);
 	}
 
 	function FullTitle() {
