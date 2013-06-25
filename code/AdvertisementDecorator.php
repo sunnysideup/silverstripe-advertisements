@@ -98,7 +98,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
 			if($advertisements->count()) {
 				$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... (list below shows all slides available, but on the ticked ones are shown.)'), Advertisement::$plural_name);
-				$fields->addFieldToTab($tabName, new CheckboxSetField("Advertisements", $txt, $advertisements->map("ID", "FullTitle")));
+				$fields->addFieldToTab($tabName, new CheckboxSetField("Advertisements", $txt, $advertisements->map("ID", "FullTitle")->toArray()));
 				if(class_exists("DataObjectSorterController")) {
 					$shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
 					if($shownAdvertisements) {
@@ -125,8 +125,15 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$styles = AdvertisementStyle::get();
 			if($styles->count()) {
 				$fields->addFieldToTab($tabName, $this->MyHeaderField("Style"));
-				$list = $styles->map("ID", "Title",$emptyString = _t("AdvertisementDecorator.SELECTSTYLE", "--select style--"), $sortByTitle = true);
-				$fields->addFieldToTab($tabName, new DropdownField("AdvertisementStyleID", _t("AdvertisementDecorator.STYLECREATED", "Select style (styles are created by your developer)"), $list));
+				$list = $styles->map("ID", "Title", $emptyString = _t("AdvertisementDecorator.SELECTSTYLE", "--select style--"), $sortByTitle = true);
+				$fields->addFieldToTab(
+					$tabName,
+					new DropdownField(
+						"AdvertisementStyleID",
+						_t("AdvertisementDecorator.STYLECREATED", "Select style (styles are created by your developer)"),
+						$list
+					)
+				);
 			}
 
 			$txt = sprintf(_t("AdvertisementDecorator.EDIT", 'Edit %1$s'), Advertisement::$plural_name);
