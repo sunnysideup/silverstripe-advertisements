@@ -3,7 +3,7 @@
 	"type": "silverstripe-module",
 	"description": "Uses the jQuery extension cycle to create advertisements ",
 	"homepage": "http://www.silverstripe-webdevelopment.com",
-	"keywords": ["advertisements", "slides", "silverstripe"],
+	"keywords": ["advertisements", "slides", "slideshow", "carousel", "silverstripe"],
 	"license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
 	"authors":[
 		{
@@ -16,6 +16,9 @@
 	"require":{
 		"silverstripe/framework": ">=3.0.0",
 		"silverstripe/cms": ">=3.0.0",
-		"silverstripe/dataobjectsorter": ">=3.0.0"
-	}
+		"silverstripe/dataobjectsorter": "dev-master"
+	},
+	"extra": {
+		"installer-name": "advertisements"
+	}	
 }
