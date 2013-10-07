@@ -7,29 +7,21 @@
 
 class Advertisement extends DataObject {
 
-	protected static $thumbnail_size = 140;
-		static function set_thumbnail_size($i) {self::$thumbnail_size = $i;}
-		static function get_thumbnail_size() {return self::$thumbnail_size;}
+	private static $thumbnail_size = 140;
 
-	protected static $width = 0;
-		static function set_width($i) {self::$width = $i;}
-		static function get_width() {return self::$width;}
+	private static $width = 0;
 
-	protected static $height = 0;
-		static function set_height($i) {self::$height = $i;}
-		static function get_height() {return self::$height;}
+	private static $height = 0;
 
-	protected static $resize_images = true;
-		static function set_resize_images($b) {self::$resize_images = $b;}
-		static function get_resize_images() {return self::$resize_images;}
+	private static $resize_images = true;
 
-	static function recommended_image_size_statement() {
+	public static function recommended_image_size_statement() {
 		$array = array();
-		if(self::get_width() ) {
-			$array[] = "width = ".self::get_width()."px";
+		if(Config::inst()->get("Advertisement", "width") ) {
+			$array[] = "width = ".Config::inst()->get("Advertisement", "width")."px";
 		}
-		if(self::get_height() ) {
-			$array[] = "height = ".self::get_height()."px";
+		if(Config::inst()->get("Advertisement", "height") ) {
+			$array[] = "height = ".Config::inst()->get("Advertisement", "height")."px";
 		}
 		$count = count($array);
 		if($count == 0) {
@@ -40,49 +32,44 @@ class Advertisement extends DataObject {
 		}
 	}
 
-	static $db = array(
+	private static $db = array(
 		"Title" => "Varchar(255)",
 		"ExternalLink" => "Varchar(150)",
 		"Description" => "Text",
 		"Sort" => "Int"
 	);
 
-	static $has_one = array(
+	private static $has_one = array(
 		"AdvertisementImage" => "Image",
 		"LinkedPage" => "SiteTree",
 		"AdditionalImage" => "Image"
 	);
 
-	public static $belongs_many_many = array(
+	private static $belongs_many_many = array(
 		"Parents" => "SiteTree",
 	);
 
-	static $casting = array(
+	private static $casting = array(
 		"FullTitle" => "HTMLText",
 		"Link" => "Varchar",
 		"GroupID" => "Int"
 	);
 
-	static $field_labels = array(
-	);
-
-	static $defaults = array(
+	private static $defaults = array(
 		"Sort" => 1000
 	);
 
-	public static $default_sort = "\"Sort\" ASC, \"Title\" ASC";
+	private static $default_sort = "\"Sort\" ASC, \"Title\" ASC";
 
-	public static $searchable_fields = array(
+	private static $searchable_fields = array(
 		"Title" => "PartialMatchFilter"
 	);
 
-	public static $singular_name = "Advertisement";
-		static function set_singular_name($v) {self::$singular_name = $v;}
+	private static $singular_name = "Advertisement";
 
-	public static $plural_name = "Advertisements";
-		static function set_plural_name($v) {self::$plural_name = $v;}
+	private static $plural_name = "Advertisements";
 
-	static $summary_fields = array(
+	private static $summary_fields = array(
 		"FullTitle" => "Image",
 		"Link" => "Link"
 	);
@@ -110,7 +97,7 @@ class Advertisement extends DataObject {
 		if($this->AdvertisementImageID) {
 			$image = $this->AdvertisementImage();
 			if($image && $image->exists()) {
-				$thumb = $image->setSize(self::get_thumbnail_size(),self::get_thumbnail_size());
+				$thumb = $image->setSize(Config::inst()->get("Advertisement", "thumbnail_size"),Config::inst()->get("Advertisement", "thumbnail_size"));
 				if($thumb) {
 					$s = " <img src=\"".$thumb->Link()."\" title=\"".$thumb->Link()."\"/ style=\"vertical-align: top; display: block; float: left; padding-right: 10px; \"><div style=\"width: 100%;\">".$s."</div><div style=\"clear: left;\"></div>";
 				}
@@ -125,7 +112,7 @@ class Advertisement extends DataObject {
 
 	function getGroupID() {
 		if($this->AdvertisementImageID) {
-			$image = DataObject::get_by_id("Image", $this->AdvertisementImageID);
+			$image = Image::get()->byID($this->AdvertisementImageID);
 			if($image) {
 				return $image->ParentID;
 			}
@@ -187,8 +174,8 @@ class Advertisement extends DataObject {
 
 
 	protected function callbackFilterFunctionForMultiSelect() {
-		$inc = AdvertisementDecorator::get_page_classes_with_advertisements();
-		$exc = AdvertisementDecorator::get_page_classes_without_advertisements();
+		$inc = Config::inst()->get("AdvertisementDecorator", "page_classes_with_advertisements");
+		$exc = Config::inst()->get("AdvertisementDecorator", "page_classes_without_advertisements");
 		if(is_array($inc) && count($inc)) {
 			$string = 'return in_array($obj->class, array(\''.implode("','", $inc).'\'));';
 		}
@@ -220,8 +207,8 @@ class Advertisement extends DataObject {
 				if($imageObject) {
 					if($imageObject->ID) {
 						$imageObject->Title = Convert::raw2att($this->Title);
-						$w = Advertisement::get_width();
-						$h = Advertisement::get_height();
+						$w = Config::inst()->get("Advertisement", "width");
+						$h = Config::inst()->get("Advertisement", "height");
 						if($h && $w) {
 							$resizedImage = $imageObject->SetSize($w, $h);
 						}

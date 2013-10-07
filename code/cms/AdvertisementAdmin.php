@@ -9,12 +9,11 @@ class AdvertisementAdmin extends ModelAdmin {
 
 	public $showImportForm = false;
 
-	public static $managed_models = array('Advertisement');
+	private static $managed_models = array('Advertisement');
 
-	public static $url_segment = 'ads';
+	private static $url_segment = 'ads';
 
-	public static $menu_title = 'Ads / Slides';
-		static function set_menu_title($v) {self::$menu_title = $v;}
+	private static $menu_title = 'Ads / Slides';
 
 }
 

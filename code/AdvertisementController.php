@@ -3,7 +3,7 @@
 
 class AdvertisementController extends Controller {
 
-	static $allowed_actions = array(
+	private static $allowed_actions = array(
 		"removealladvertisements" => "ADMIN",
 		"deletealladvertisements" => "ADMIN"
 	);
@@ -17,19 +17,17 @@ class AdvertisementController extends Controller {
 		DB::query("DELETE FROM SiteTree_Advertisements WHERE SiteTreeID = ".$id);
 		DB::query("UPDATE SiteTree SET AdvertisementsFolderID = 0 WHERE SiteTree.ID = ".$id);
 		DB::query("UPDATE SiteTree_Live SET AdvertisementsFolderID = 0 WHERE SiteTree_Live.ID = ".$id);
-		LeftAndMain::ForceReload();
 		return sprintf(
 			_t("AdvertisementController.REMOVEDALL", 'Removed all %1$s from this page, please reload page to see results.')
-			, Advertisement::$plural_name
+			, Config::inst()->get("Advertisement", "plural_name")
 		);
 	}
 
 	function deletealladvertisements($request) {
 		DB::query("DELETE FROM \"Advertisement\"");
-		LeftAndMain::ForceReload();
 		return sprintf(
 			_t("AdvertisementController.DELETEDALL", 'Deleted all %1$s from this website, please reload page to see results.')
-			, Advertisement::$plural_name
+			, Config::inst()->get("Advertisement", "plural_name")
 		);
 	}
 

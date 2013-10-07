@@ -14,11 +14,11 @@
 		}
 	],
 	"require":{
-		"silverstripe/framework": ">=3.0.0",
-		"silverstripe/cms": ">=3.0.0",
+		"silverstripe/framework": "dev-master",
+		"silverstripe/cms": "dev-master",
 		"silverstripe/dataobjectsorter": "dev-master"
 	},
 	"extra": {
 		"installer-name": "advertisements"
-	}	
+	}
 }
