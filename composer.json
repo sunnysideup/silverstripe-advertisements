@@ -16,7 +16,7 @@
 	"require":{
 		"silverstripe/framework": "~3.1",
 		"silverstripe/cms": "~3.1",
-		"silverstripe/dataobjectsorter": "dev-master"
+		"sunnysideup/dataobjectsorter": "dev-master"
 	},
 	"extra": {
 		"installer-name": "advertisements"
