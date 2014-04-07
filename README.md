@@ -1,6 +1,5 @@
-###############################################
 Advertisements
-###############################################
+================================================================================
 
 Adds slides / advertisements to any Silverstripe
 website page using the jQuery cycle extension.
