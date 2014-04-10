@@ -189,7 +189,12 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		elseif($this->owner->URLSegment != "home") {
 			$parent = SiteTree::get()->where("URLSegment = 'home' AND \"ClassName\" <> 'RedirectorPage'")->First();
 			if(!$parent) {
-				$parent = HomePage::get()->First();
+				if(class_exists("HomePage")) {
+					$parent = HomePage::get()->First();
+				}
+				else {
+					$parent = Page::get()->filter(array("URLSegment" => "home"))->First();
+				}
 			}
 		}
 		if($parent) {
