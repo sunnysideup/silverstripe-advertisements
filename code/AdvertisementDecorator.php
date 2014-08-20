@@ -85,7 +85,8 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
 			if($advertisements->count()) {
 				$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... (list below shows all slides available, but on the ticked ones are shown.)'), Config::inst()->get("Advertisement", "plural_name"));
-				$fields->addFieldToTab($tabName, new CheckboxSetField("Advertisements", $txt, $advertisements->map("ID", "FullTitle")->toArray()));
+				$advertisementsGridField = new GridField('Advertisements',  $txt,  $advertisements, GridFieldConfig_RelationEditor::create());
+				$fields->addFieldToTab($tabName, $advertisementsGridField);
 				if(class_exists("DataObjectSorterController")) {
 					$shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
 					if($shownAdvertisements) {
