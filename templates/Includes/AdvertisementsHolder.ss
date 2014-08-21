@@ -1,9 +1,9 @@
 <% if AdvertisementSet %>
-<div id="AdvertisementsHolder">
+<div id="AdvertisementsHolder" class="cycle-slideshow">
 <% loop AdvertisementSet %>
 	<div class="advertisement"><% if Link %>
 		<a href="$Link"><% end_if %>
-		<img src="$ResizedAdvertisementImage.FileName" alt="$Title.ATT" />
+		<img src="$AdvertisementImage.FileName" alt="$Title.ATT" />
 		<% if Link %></a><% end_if %>
 	</div>
 <% end_loop %>

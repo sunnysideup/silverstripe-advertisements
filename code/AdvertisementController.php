@@ -3,6 +3,7 @@
 
 class AdvertisementController extends Controller {
 
+
 	private static $allowed_actions = array(
 		"removealladvertisements" => "ADMIN",
 		"deletealladvertisements" => "ADMIN"

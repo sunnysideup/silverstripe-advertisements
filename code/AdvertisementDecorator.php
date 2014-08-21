@@ -8,22 +8,31 @@
 
 class AdvertisementDecorator extends SiteTreeExtension {
 
+	private static $uses_cycle2 = false;
+
 	public static function add_requirements($alternativeFileLocation = null) {
 		Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
-		Requirements::javascript("advertisements/javascript/Advertisements.js");
-		$file = "";
-		$customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
-		if($customJavascript) {
-			$file = project()."/javascript/AdvertisementsExecutive.js";
+		if(Config::inst()->get("AdvertisementDecorator", "uses_cycle2")) {
+			Requirements::javascript("advertisements/javascript/jquery.cycle2.min.js");
+			Requirements::javascript("advertisements/javascript/jquery.cycle2.carousel.min.js");
+			Requirements::javascript("advertisements/javascript/jquery.cycle2.center.min.js");
 		}
-		elseif($alternativeFileLocation) {
-			$file = $alternativeFileLocation;
+		else {
+			Requirements::javascript("advertisements/javascript/Advertisements.js");
+			$file = "";
+			$customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
+			if($customJavascript) {
+				$file = project()."/javascript/AdvertisementsExecutive.js";
+			}
+			elseif($alternativeFileLocation) {
+				$file = $alternativeFileLocation;
+			}
+			if(!$file)  {
+				$file = "advertisements/javascript/AdvertisementsExecutive.js";
+			}
+			Requirements::javascript($file);
+			Requirements::themedCSS("Advertisements", "advertisements");
 		}
-		if(!$file)  {
-			$file = "advertisements/javascript/AdvertisementsExecutive.js";
-		}
-		Requirements::javascript($file);
-		Requirements::themedCSS("Advertisements", "advertisements");
 	}
 
 	private static $db = array(
