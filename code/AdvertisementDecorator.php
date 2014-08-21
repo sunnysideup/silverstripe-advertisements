@@ -167,7 +167,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 
 	function AdvertisementSet($style = null) {
 		if($this->classHasAdvertisements($this->owner->ClassName)) {
-			$browseSet = $this->advertisementsToShow();
+			$browseSet = $this->owner->advertisementsToShow();
 			if($browseSet) {
 				$file = null;
 				if($this->owner->AdvertisementStyleID) {

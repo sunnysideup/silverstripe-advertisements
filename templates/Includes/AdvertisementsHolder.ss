@@ -1,7 +1,9 @@
+tttttttttttttttttttttttttttttttt
 <% if AdvertisementSet %>
 <div id="AdvertisementsHolder">
 <% loop AdvertisementSet %>
 	<div class="advertisement"><% if Link %>
+	SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
 		<a href="$Link"><% end_if %>
 		<img src="$ResizedAdvertisementImage.FileName" alt="$Title.ATT" />
 		<% if Link %></a><% end_if %>
