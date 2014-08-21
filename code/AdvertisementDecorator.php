@@ -64,38 +64,24 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				}
 			}
 
-			//create new advertisements
-			$txt = sprintf(_t("AdvertisementDecorator.CREATE", 'Create new %1$s'), Config::inst()->get("Advertisement", "plural_name"));
-			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
-			$txt = sprintf(
-				_t(
-					"AdvertisementDecorator.CREATENEWFROMFOLDER",
-					'Create New %1$s from images in the folder selected below - each image in the folder will be used to create a %3$s. %2$s'
-				),
-				Config::inst()->get("Advertisement", "plural_name"),
-				Advertisement::recommended_image_size_statement(),
-				Config::inst()->get("Advertisement", "singular_name")
-			);
-			if(Folder::get()->count()) {
-				$fields->addFieldToTab($tabName, new TreeDropdownField( 'AdvertisementsFolderID', $txt, 'Folder'));
-			}
 			//$advertisementsCount = DB::query("SELECT COUNT(ID) FROM \"Advertisement\" $whereDB ;")->value();
-			$advertisements = Advertisement::get()->where($where);
+			$advertisements = $this->owner->Advertisements()->where($where);
 			$txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get("Advertisement", "plural_name"));
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
-			if($advertisements->count()) {
-				$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... (list below shows all slides available, but on the ticked ones are shown.)'), Config::inst()->get("Advertisement", "plural_name"));
-				$advertisementsGridField = new GridField('Advertisements',  $txt,  $advertisements, GridFieldConfig_RelationEditor::create());
-				$fields->addFieldToTab($tabName, $advertisementsGridField);
-				if(class_exists("DataObjectSorterController")) {
-					$shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
-					if($shownAdvertisements) {
-						$array = $shownAdvertisements->column("ID");
-						$idString = implode(",",$array);
-						$link = DataObjectSorterController::popup_link("Advertisement", $filterField = "ID", $filterValue = $idString, $linkText = "sort ".Config::inst()->get("Advertisement", "plural_name"), $titleField = "FullTitle");
-						$fields->addFieldToTab($tabName, new LiteralField("AdvertisementsSorter", $link));
-					}
+			$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... (list below shows all slides available, but on the ticked ones are shown.)'), Config::inst()->get("Advertisement", "plural_name"));
+			$advertisementsGridField = new GridField('Advertisements',  $txt,  $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
+			$fields->addFieldToTab($tabName, $advertisementsGridField);
+			if(class_exists("DataObjectSorterController")) {
+				$shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
+				if($shownAdvertisements) {
+					$array = $shownAdvertisements->column("ID");
+					$idString = implode(",",$array);
+					$link = DataObjectSorterController::popup_link("Advertisement", $filterField = "ID", $filterValue = $idString, $linkText = "sort ".Config::inst()->get("Advertisement", "plural_name"), $titleField = "FullTitle");
+					$fields->addFieldToTab($tabName, new LiteralField("AdvertisementsSorter", $link));
 				}
+			}
+			if($advertisements->count()) {
+
 			}
 			else {
 				$txt = sprintf(
@@ -110,6 +96,23 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				$txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Config::inst()->get("Advertisement", "plural_name"), $parent->Title);
 				$fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", $txt));
 			}
+
+			//create new advertisements
+			$txt = sprintf(_t("AdvertisementDecorator.CREATE", 'Create new %1$s'), Config::inst()->get("Advertisement", "plural_name"));
+			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
+			$txt = sprintf(
+				_t(
+					"AdvertisementDecorator.CREATENEWFROMFOLDER",
+					'Create New %1$s from images in the folder selected - each image in the folder will be used to create a %3$s. %2$s'
+				),
+				Config::inst()->get("Advertisement", "plural_name"),
+				Advertisement::recommended_image_size_statement(),
+				Config::inst()->get("Advertisement", "singular_name")
+			);
+			if(Folder::get()->count()) {
+				$fields->addFieldToTab($tabName, new TreeDropdownField( 'AdvertisementsFolderID', $txt, 'Folder'));
+			}
+
 			$styles = AdvertisementStyle::get();
 			if($styles->count()) {
 				$fields->addFieldToTab($tabName, $this->MyHeaderField("Style"));
