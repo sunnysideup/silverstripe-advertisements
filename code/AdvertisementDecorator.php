@@ -8,14 +8,21 @@
 
 class AdvertisementDecorator extends SiteTreeExtension {
 
-	private static $uses_cycle2 = false;
+	/**
+	 * load an alternative collection of JS file to power your
+	 * slideslow
+	 * see yml files for example
+	 *
+	 */
+	private static $alternative_javascript_file_array = array();
 
 	public static function add_requirements($alternativeFileLocation = null) {
 		Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
-		if(Config::inst()->get("AdvertisementDecorator", "uses_cycle2")) {
-			Requirements::javascript("advertisements/javascript/jquery.cycle2.min.js");
-			Requirements::javascript("advertisements/javascript/jquery.cycle2.carousel.min.js");
-			Requirements::javascript("advertisements/javascript/jquery.cycle2.center.min.js");
+		$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file");
+		if(count($jsFileArray)) {
+			foreach($jsFileArray as $file) {
+				Requirements::javascript($file);
+			}
 		}
 		else {
 			Requirements::javascript("advertisements/javascript/Advertisements.js");

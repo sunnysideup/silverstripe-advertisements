@@ -22,11 +22,17 @@ Advertisement:
   height: 100
   resize_images: true
 
-#ADVANCED
+#ADVANCED OPTION 1
 AdvertisementStyle:
   array_of_js_file_options:
     "slideshow style 1" : "mysite/javascript/slideshow1.js"
     "slideshow style 2" : "mysite/javascript/slideshow1.js"
+
+#ADVANCED OPTION 2
+AdvertisementDecorator:
+  alternative_javascript_file_array:
+    - mysite/javascript/mycoolscript1.js
+    - mysite/javascript/mycoolscript2.js
 
 ###################################
 # End advertisements
