@@ -14,11 +14,13 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	 * see yml files for example
 	 *
 	 */
+
 	private static $alternative_javascript_file_array = array();
 
 	public static function add_requirements($alternativeFileLocation = null) {
 		Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
-		$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file");
+		$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
+
 		if(count($jsFileArray)) {
 			foreach($jsFileArray as $file) {
 				Requirements::javascript($file);
