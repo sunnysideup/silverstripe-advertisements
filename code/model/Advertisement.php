@@ -25,10 +25,10 @@ class Advertisement extends DataObject {
 		}
 		$count = count($array);
 		if($count == 0) {
-			return "No recommeded image size has been set.";
+			return _t("Advertisement.NO_RECOMMENDED_SIZE_HAS_BEEN_SET","No recommeded image size has been set.");
 		}
 		else {
-			return "Recommended size: ".implode(" and ", $array).".";
+			return _t("Advertisement.RECOMMENDED_SIZE","Recommended Size").": ".implode(" "._t("Advertisement.AND","and")." ", $array).".";
 		}
 	}
 
@@ -133,24 +133,49 @@ class Advertisement extends DataObject {
 		$fields->removeFieldFromTab("Root.Parents", "Parents");
 		$fields->removeFieldFromTab("Root", "Parents");
 		$fields->addFieldToTab("Root.Main", new ReadonlyField("Link"));
-		$fields->addFieldToTab("Root.Main", new UploadField($name = "AdvertisementImage", $title = self::$singular_name." image. ".self::recommended_image_size_statement()));
-		$fields->addFieldToTab("Root.Main", new UploadField($name = "AdditionalImage", $title = self::$singular_name." additional image. ".self::recommended_image_size_statement()));
+		$fields->addFieldToTab("Root.Main", $mainImageField = new UploadField($name = "AdvertisementImage", $title = $this->i18n_singular_name()));
+		$mainImageField->setRightTitle(self::recommended_image_size_statement());
+		$fields->addFieldToTab(
+			"Root.Main",
+			$additionalImageField =new UploadField(
+				$name = "AdditionalImage",
+				$title = $this->i18n_singular_name()." "._t("Advertisement.ADDITIONAL_IMAGE", "additional image")
+			)
+		);
+		$additionalImageField->setRightTitle(self::recommended_image_size_statement());
 		if($this->ID) {
-			$treeField = new TreeMultiselectField("Parents", _t("Advertisement.GETCMSFIELDSPARENTID", "only show on ... (leave blank to show on all ".self::$singular_name." pages)"), "SiteTree");
+			$treeField = new TreeMultiselectField(
+				"Parents",
+				_t("Advertisement.GETCMSFIELDSPARENTID", "only show on ... (leave blank to show on all "
+					.$this->i18n_singular_name()
+					." pages)"),
+				"SiteTree"
+			);
 			/*$callback = $this->callbackFilterFunctionForMultiSelect();
 			if($callback) {
 				$treeField->setFilterFunction ($callback);
 			}*/
 			$fields->addFieldToTab("Root.ShownOn",$treeField);
 		}
-		$fields->addFieldToTab("Root.OptionalLink", new TextField($name = "ExternalLink", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINK", "link to external site (e.g. http://www.wikipedia.org) - this will override an internal link")));
+		$fields->addFieldToTab(
+			"Root.OptionalLink",
+			$externalLinkField = new TextField($name = "ExternalLink", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINK", "link to external site"))
+		);
+		$externalLinkField->setRightTitle(_t("Advertisement.GETCMSFIELDSEXTERNALLINK_EXPLANATION", "(e.g. http://www.wikipedia.org) - this will override an internal link"));
 		$fields->addFieldToTab("Root.OptionalLink", new TreeDropdownField($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = "SiteTree"));
 		$fields->addFieldToTab("Root.OptionalLink", new CheckboxField($name = "RemoveInternalLink", $title = _t("Advertisement.RemoveInternalLink", "remove internal link")));
 		if(class_exists("DataObjectSorterController")) {
 			$fields->addFieldToTab("Root.Position", new LiteralField("AdvertisementsSorter", DataObjectSorterController::popup_link("Advertisement", $filterField = "", $filterValue = "", $linkText = "Sort ".Advertisement::$plural_name, $titleField = "FullTitle")));
 		}
 		else {
-			$fields->addFieldToTab("Root.Position", new NumericField($name = "Sort", "Sort index number (the lower the number, the earlier it shows up"));
+			$fields->addFieldToTab(
+				"Root.Position",
+				$sortField = new NumericField(
+					"Sort",
+					_t("Advertisement.SORT", "Sort index number")
+				)
+			);
+			$sortField->setRightTitle(_t("Advertisement.SORT_EXPLANATION", "the lower the number, the earlier it shows"));
 		}
 		$fields->removeFieldFromTab("Root.Main", "AlternativeSortNumber");
 		return $fields;
@@ -162,7 +187,8 @@ class Advertisement extends DataObject {
 			$this->LinkedPageID= 0;
 		}
 		if(!$this->Sort) {
-			$this->Sort = self::$defaults["Sort"];
+			$defaults = $this->Config()->get("defaults");
+			$this->Sort = isset($defaults["Sort"]) ? $defaults["Sort"] : 0;
 		}
 	}
 
@@ -201,7 +227,7 @@ class Advertisement extends DataObject {
 		$resizedImage = null;
 		$imageID = intval($this->AdvertisementImageID+ 0);
 		if($imageID) {
-			if(self::$resize_images) {
+			if($this->Config()->get("resize_images")) {
 				$imageObject = Image::get()->byID($imageID);
 				$resizedImage = $imageObject;
 				if($imageObject) {

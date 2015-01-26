@@ -120,7 +120,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
 			$txt = sprintf(
 				_t(
-					"AdvertisementDecorator.CREATENEWFROMFOLDER",
+					"AdvertisementDecorator.CREATENEWFROMFOLDER_EXPLANATION",
 					'Create New %1$s from images in the folder selected - each image in the folder will be used to create a %3$s. %2$s'
 				),
 				Config::inst()->get("Advertisement", "plural_name"),
@@ -128,7 +128,15 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				Config::inst()->get("Advertisement", "singular_name")
 			);
 			if(Folder::get()->count()) {
-				$fields->addFieldToTab($tabName, new TreeDropdownField( 'AdvertisementsFolderID', $txt, 'Folder'));
+				$fields->addFieldToTab(
+					$tabName,
+					$treeDropdownField = new TreeDropdownField(
+						'AdvertisementsFolderID',
+						_t("AdvertisementDecorator.CREATENEWFROMFOLDER", "Create from folder"),
+						'Folder'
+					)
+				);
+				$treeDropdownField->setRightTitle($txt);
 			}
 
 			$styles = AdvertisementStyle::get();
@@ -137,12 +145,13 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				$list = $styles->map("ID", "Title", $emptyString = _t("AdvertisementDecorator.SELECTSTYLE", "--select style--"), $sortByTitle = true);
 				$fields->addFieldToTab(
 					$tabName,
-					new DropdownField(
+					$selectStyleField = new DropdownField(
 						"AdvertisementStyleID",
-						_t("AdvertisementDecorator.STYLECREATED", "Select style (styles are created by your developer)"),
+						_t("AdvertisementDecorator.STYLECREATED", "Select style"),
 						$list
 					)
 				);
+				$selectStyleField->setRightTitle(_t("AdvertisementDecorator.STYLECREATED_EXPLANATION", "Styles are created by your developer"));
 			}
 
 			$txt = sprintf(_t("AdvertisementDecorator.EDIT", 'Edit %1$s'), Config::inst()->get("Advertisement", "plural_name"));
@@ -162,13 +171,13 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$txtConfirmRemove = sprintf(_t("AdvertisementDecorator.CONFIRMREMOVE", 'Are you sure you want to remove all %1$s from this page?'), Config::inst()->get("Advertisement", "plural_name"));
 			$removeallLink = 'advertisements/removealladvertisements/'.$this->owner->ID.'/';
 			$jquery = 'if(confirm(\''.$txtConfirmRemove.'\')) {jQuery(\'#removealladvertisements\').load(\''.$removeallLink.'\');} return false;';
-			$fields->addFieldToTab($tabName, new LiteralField("removealladvertisements", '<p><a href="'.$removeallLink.'" onclick="'.$jquery.'"  id="removealladvertisements">'.$txtRemove.'</a></p>'));
+			$fields->addFieldToTab($tabName, new LiteralField("removealladvertisements", '<p class="message warning"><a href="'.$removeallLink.'" onclick="'.$jquery.'"  id="removealladvertisements"  class="ss-ui-button">'.$txtRemove.'</a></p>'));
 
 			$txtDelete = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete all %1$s from from this website (but not the images associated with them)'), Config::inst()->get("Advertisement", "plural_name"));
 			$txtConfirmDelete = sprintf(_t("AdvertisementDecorator.CONFIRMDELETE", 'Are you sure you want to delete all %1$s - there is no UNDO?'), Config::inst()->get("Advertisement", "plural_name"));
 			$deleteallLink = 'advertisements/deletealladvertisements/'.$this->owner->ID.'/';
 			$jquery = 'if(confirm(\''.$txtConfirmDelete.'\')) {jQuery(\'#deletealladvertisements\').load(\''.$deleteallLink.'\');} return false;';
-			$fields->addFieldToTab($tabName, new LiteralField("deletealladvertisements", '<p><a href="'.$deleteallLink.'" onclick="'.$jquery.'"  id="deletealladvertisements">'.$txtDelete.'</a></p>'));
+			$fields->addFieldToTab($tabName, new LiteralField("deletealladvertisements", '<p class="message bad"><a href="'.$deleteallLink.'" onclick="'.$jquery.'"  id="deletealladvertisements" class="ss-ui-button">'.$txtDelete.'</a></p>'));
 
 		}
 		return $fields;
