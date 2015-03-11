@@ -21,30 +21,32 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	 * if there is less than two slieds, then only CSS is included.
 	 * @param String | Null $alternativeFileLocation
 	 */
-	public static function add_requirements($alternativeFileLocation = null) {
-		if($this->owner->AdvertisementSet()->count() > 1) {
-			Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
-			$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
+	public function addRequirements($alternativeFileLocation = null) {
+		if($set = $this->owner->AdvertisementSet()) {
+			if($set->count() > 1) {
+				Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
+				$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
 
-			if(count($jsFileArray)) {
-				foreach($jsFileArray as $file) {
+				if(count($jsFileArray)) {
+					foreach($jsFileArray as $file) {
+						Requirements::javascript($file);
+					}
+				}
+				else {
+					Requirements::javascript("advertisements/javascript/Advertisements.js");
+					$file = "";
+					$customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
+					if($customJavascript) {
+						$file = project()."/javascript/AdvertisementsExecutive.js";
+					}
+					elseif($alternativeFileLocation) {
+						$file = $alternativeFileLocation;
+					}
+					if(!$file)  {
+						$file = "advertisements/javascript/AdvertisementsExecutive.js";
+					}
 					Requirements::javascript($file);
 				}
-			}
-			else {
-				Requirements::javascript("advertisements/javascript/Advertisements.js");
-				$file = "";
-				$customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
-				if($customJavascript) {
-					$file = project()."/javascript/AdvertisementsExecutive.js";
-				}
-				elseif($alternativeFileLocation) {
-					$file = $alternativeFileLocation;
-				}
-				if(!$file)  {
-					$file = "advertisements/javascript/AdvertisementsExecutive.js";
-				}
-				Requirements::javascript($file);
 			}
 		}
 		Requirements::themedCSS("Advertisements", "advertisements");
@@ -106,7 +108,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	private static $_advertisements = null;
 
 	public function updateCMSFields(FieldList $fields) {
-		if($this->classHasAdvertisements($this->owner->ClassName)) {
+		if(self::class_has_advertisements($this->owner->ClassName)) {
 			$tabName = $this->MyTabName();
 			//advertisements shown...
 			$where = '1 = 1';
@@ -242,12 +244,12 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	 *
 	 * @param AdvertisementStyle
 	 *
-	 * @return ArrayList
+	 * @return ArrayList | false
 	 */
 	function AdvertisementSet($style = null) {
-		if(isset(self::$_advertisements[$this->owner->ID])) {
+		if(!isset(self::$_advertisements[$this->owner->ID])) {
 			self::$_advertisements[$this->owner->ID] = false;
-			if($this->classHasAdvertisements($this->owner->ClassName)) {
+			if(self::class_has_advertisements($this->owner->ClassName)) {
 				$browseSet = $this->owner->advertisementsToShow();
 				if($browseSet) {
 					$file = null;
@@ -257,7 +259,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 					if($style) {
 						$file = $style->FileLocation;
 					}
-					self::add_requirements($file);
+					$this->addRequirements($file);
 					self::$_advertisements[$this->owner->ID] = $browseSet;
 				}
 			}
@@ -286,7 +288,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			}
 		}
 		if($parent) {
-			if($this->classHasAdvertisements($parent->ClassName)) {
+			if(self::class_has_advertisements($parent->ClassName)) {
 				return $parent;
 			}
 		}
@@ -294,7 +296,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-		if($this->classHasAdvertisements($this->owner->ClassName)) {
+		if(self::class_has_advertisements($this->owner->ClassName)) {
 			$objects = array(0 => 0);
 			$images = array(0 => 0);
 			$dos1 = $this->advertisementsToShow();
@@ -381,7 +383,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	 *
 	 * @return Boolean
 	 */
-	protected function classHasAdvertisements($className) {
+	protected static function class_has_advertisements($className) {
 		$result = true;
 		$inc =  Config::inst()->get("AdvertisementDecorator","page_classes_with_advertisements");
 		$exc =  Config::inst()->get("AdvertisementDecorator","page_classes_without_advertisements");
