@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class xmlns="http://xml.phpdox.net/src" full="AdvertisementDecorator" namespace="" name="AdvertisementDecorator" abstract="false" final="false" start="9" end="429">
+  <file path="/var/www/_modules/advertisements/trunk/docs/en/phpdox/../../../code/model" file="AdvertisementDecorator.php" realpath="/var/www/_modules/advertisements/trunk/code/model/AdvertisementDecorator.php" size="15569" time="2015-03-14T10:23:33+13:00" unixtime="1426281813" sha1="f8ded9644b36ed332f968a8285f419ed6f398d33" relative="code/model/AdvertisementDecorator.php"/>
+  <docblock>
+    <description compact="author nicolaas [at] sunnysideup.co.nz"/>
+  </docblock>
+  <extends full="SiteTreeExtension" namespace="" name="SiteTreeExtension"/>
+  <member name="alternative_javascript_file_array" type="array" visibility="private" line="17">
+    <docblock>
+      <description compact="load an alternative collection of JS file to power your slideslow see yml files for example"/>
+      <var type="object">
+        <type full="Array" namespace="" name="Array"/>
+      </var>
+    </docblock>
+  </member>
+  <method name="addRequirements" start="25" end="54" abstract="false" final="false" static="false" visibility="public">
+    <docblock>
+      <description compact="Adds requirements, but only if there is more than one Slide/Advertisement if there is less than two slieds, then only CSS is included."/>
+      <param description="| Null $alternativeFileLocation" type="object">
+        <type full="String" namespace="" name="String"/>
+      </param>
+      <param type="object" variable="$count">
+        <type full="Int" namespace="" name="Int"/>
+      </param>
+    </docblock>
+    <parameter name="alternativeFileLocation" byreference="false" type="{unknown}" default="null"/>
+    <parameter name="count" byreference="false" type="integer" default="0"/>
+  </method>
+  <member name="db" type="array" visibility="private" line="59">
+    <docblock>
+      <description/>
+      <inherited/>
+    </docblock>
+  </member>
+  <member name="has_one" type="array" visibility="private" line="66">
+    <docblock>
+      <description/>
+      <inherited/>
+    </docblock>
+  </member>
+  <member name="many_many" type="array" visibility="private" line="74">
+    <docblock>
+      <description/>
+      <inherited/>
+    </docblock>
+  </member>
+  <member name="use_custom_javascript" type="{unknown}" default="false" visibility="private" line="81">
+    <docblock>
+      <description/>
+      <var type="object">
+        <type full="Boolean" namespace="" name="Boolean"/>
+      </var>
+    </docblock>
+  </member>
+  <member name="page_classes_without_advertisements" type="array" visibility="private" line="87">
+    <docblock>
+      <description compact="e.g. HomePage, ContactPage, etc..."/>
+      <var type="object">
+        <type full="Array" namespace="" name="Array"/>
+      </var>
+    </docblock>
+  </member>
+  <member name="page_classes_with_advertisements" type="array" visibility="private" line="93">
+    <docblock>
+      <description compact="e.g. HomePage, ContactPage, etc..."/>
+      <var type="object">
+        <type full="Array" namespace="" name="Array"/>
+      </var>
+    </docblock>
+  </member>
+  <method name="updateCMSFields" start="95" end="209" abstract="false" final="false" static="false" visibility="public">
+    <parameter name="fields" byreference="false" type="object">
+      <type full="\\FieldList" namespace="\" name="FieldList"/>
+    </parameter>
+    <inline>
+      <comment value="advertisements shown..." line="98"/>
+      <comment value="$advertisementsCount = DB::query(&quot;SELECT COUNT(ID) FROM \&quot;Advertisement\&quot; $whereDB ;&quot;)-&gt;value();" line="110"/>
+      <comment value="create new advertisements" line="143"/>
+    </inline>
+  </method>
+  <method name="MyTabName" start="215" end="219" abstract="false" final="false" static="false" visibility="protected">
+    <docblock>
+      <description/>
+      <return type="object">
+        <type full="String" namespace="" name="String"/>
+      </return>
+    </docblock>
+  </method>
+  <method name="MyHeaderField" start="225" end="229" abstract="false" final="false" static="false" visibility="protected">
+    <docblock>
+      <description/>
+      <return type="object">
+        <type full="LiteralField" namespace="" name="LiteralField"/>
+      </return>
+    </docblock>
+    <parameter name="title" byreference="false" type="{unknown}"/>
+  </method>
+  <method name="onBeforeWrite" start="232" end="292" abstract="false" final="false" static="false" visibility="public">
+    <inline>
+      <comment value="check for non-existing images and delete advertisements associated with it" line="244"/>
+      <comment value="check if a folder has been set and create objects" line="256"/>
+      <comment value="remove advdertisements if parent is being used..." line="279"/>
+    </inline>
+  </method>
+  <member name="_advertisements_set_cache" type="array" visibility="private" line="307">
+    <docblock>
+      <description compact="caching"/>
+      <var type="object">
+        <type full="Array" namespace="" name="Array"/>
+      </var>
+    </docblock>
+  </member>
+  <method name="AdvertisementSet" start="317" end="340" abstract="false" final="false" static="false" visibility="public">
+    <docblock>
+      <description compact="returns the set of Advertisements that actually needs to be shown ...">taking into account if we show parents of the current ones.</description>
+      <param type="object">
+        <type full="AdvertisementStyle" namespace="" name="AdvertisementStyle"/>
+      </param>
+      <return type="object">
+        <type full="DataList" namespace="" name="DataList"/>
+      </return>
+    </docblock>
+    <parameter name="style" byreference="false" type="{unknown}" default="null"/>
+  </method>
+  <method name="advertisementParent" start="347" end="368" abstract="false" final="false" static="false" visibility="public">
+    <docblock>
+      <description compact="parent page to used for parent Advertisements walks up the three to find the right parent for the advertisements.">return SiteTree | NULL</description>
+    </docblock>
+  </method>
+  <member name="_my_advertisement_set_cache" type="array" visibility="private" line="375">
+    <docblock>
+      <description compact="caching"/>
+      <var type="object">
+        <type full="Array" namespace="" name="Array"/>
+      </var>
+    </docblock>
+  </member>
+  <method name="myAdvertisementSet" start="384" end="399" abstract="false" final="false" static="false" visibility="public">
+    <docblock>
+      <description compact="returns the set of Advertisements for this owner which may not necesarily be the actual set to show"/>
+      <return description="| false" type="object">
+        <type full="DataList" namespace="" name="DataList"/>
+      </return>
+    </docblock>
+  </method>
+  <method name="class_has_advertisements" start="411" end="425" abstract="false" final="false" static="true" visibility="protected">
+    <docblock>
+      <description compact="assumptions: 1. in general YES 2. if list of WITH is shown then it must be in that 3. otherwise check if it is specifically excluded (WITHOUT)"/>
+      <param type="object" variable="$classname">
+        <type full="String" namespace="" name="String"/>
+      </param>
+      <return type="object">
+        <type full="Boolean" namespace="" name="Boolean"/>
+      </return>
+    </docblock>
+    <parameter name="className" byreference="false" type="{unknown}"/>
+  </method>
+</class>
