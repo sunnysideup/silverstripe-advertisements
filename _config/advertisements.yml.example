@@ -1,5 +1,5 @@
 ###################################
-# Start advertisements
+# advertisements
 ###################################
 
 # if true, this will search for myproject/javascript/AdvertisementsExecutive.js | myproject is usually called mysite.
@@ -35,5 +35,4 @@ AdvertisementDecorator:
     - mysite/javascript/mycoolscript2.js
 
 ###################################
-# End advertisements
 ###################################
