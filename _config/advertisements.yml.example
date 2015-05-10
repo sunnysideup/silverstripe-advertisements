@@ -1,5 +1,5 @@
 ###################################
-# advertisements
+# Start advertisements
 ###################################
 
 # if true, this will search for myproject/javascript/AdvertisementsExecutive.js | myproject is usually called mysite.
@@ -31,8 +31,5 @@ AdvertisementStyle:
 #ADVANCED OPTION 2
 AdvertisementDecorator:
   alternative_javascript_file_array:
-    - mysite/javascript/mycoolscript1.js
-    - mysite/javascript/mycoolscript2.js
-
-###################################
-###################################
+    - advertisements/javascript/jquery.cycle2.min.js
+    - advertisements/javascript/jquery.cycle2.center.min.js

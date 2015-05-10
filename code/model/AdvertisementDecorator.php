@@ -16,84 +16,58 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	 */
 	private static $alternative_javascript_file_array = array();
 
-	/**
-	 * Adds requirements, but only if there is more than one Slide/Advertisement
-	 * if there is less than two slieds, then only CSS is included.
-	 * @param String | Null $alternativeFileLocation
-	 * @param Int $count
-	 */
-	public function addRequirements($alternativeFileLocation = null, $count = 0) {
-		if($count > 1) {
-			Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
-			$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
+	public static function add_requirements($alternativeFileLocation = null) {
+		Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
+		$jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
 
-			if(count($jsFileArray)) {
-				foreach($jsFileArray as $file) {
-					Requirements::javascript($file);
-				}
-			}
-			else {
-				Requirements::javascript("advertisements/javascript/Advertisements.js");
-				$file = "";
-				$customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
-				if($customJavascript) {
-					$file = project()."/javascript/AdvertisementsExecutive.js";
-				}
-				elseif($alternativeFileLocation) {
-					$file = $alternativeFileLocation;
-				}
-				if(!$file)  {
-					$file = "advertisements/javascript/AdvertisementsExecutive.js";
-				}
+		if(count($jsFileArray)) {
+			foreach($jsFileArray as $file) {
 				Requirements::javascript($file);
 			}
 		}
-		if($count) {
+		else {
+			Requirements::javascript("advertisements/javascript/Advertisements.js");
+			$file = "";
+			$customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
+			if($customJavascript == 1) {
+				$file = project()."/javascript/AdvertisementsExecutive.js";
+			}
+			elseif($alternativeFileLocation) {
+				$file = $alternativeFileLocation;
+			}
+			if(!$file)  {
+				$file = "advertisements/javascript/AdvertisementsExecutive.js";
+			}
+			Requirements::javascript($file);
 			Requirements::themedCSS("Advertisements", "advertisements");
 		}
 	}
 
-	/**
-	 * @inherited
-	 */
 	private static $db = array(
 		"UseParentAdvertisements" => "Boolean"
 	);
 
-	/**
-	 * @inherited
-	 */
 	private static $has_one = array(
 		"AdvertisementsFolder" => "Folder",
 		"AdvertisementStyle" => "AdvertisementStyle"
 	);
 
-	/**
-	 * @inherited
-	 */
 	private static $many_many = array(
 		"Advertisements" => "Advertisement"
 	);
 
-	/**
-	 * @var Boolean
-	 */
 	private static $use_custom_javascript = false;
 
-	/**
-	 * e.g. HomePage, ContactPage, etc...
-	 * @var Array
-	 */
 	private static $page_classes_without_advertisements = array();
 
-	/**
-	 * e.g. HomePage, ContactPage, etc...
-	 * @var Array
-	 */
+	private static $specific_name_for_advertisements = "Advertisements";
+
 	private static $page_classes_with_advertisements = array();
 
+	private static $advertisements_dos = null;
+
 	public function updateCMSFields(FieldList $fields) {
-		if(self::class_has_advertisements($this->owner->ClassName)) {
+		if($this->classHasAdvertisements($this->owner->ClassName)) {
 			$tabName = $this->MyTabName();
 			//advertisements shown...
 			$where = '1 = 1';
@@ -135,7 +109,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				);
 				$fields->addFieldToTab($tabName, new LiteralField("AdvertisementsHowToCreate", $txt));
 			}
-			if($parent = $this->owner->advertisementParent()) {
+			if($parent = $this->advertisementParent()) {
 				$txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Config::inst()->get("Advertisement", "plural_name"), $parent->Title);
 				$fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", $txt));
 			}
@@ -208,33 +182,66 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		return $fields;
 	}
 
-	/**
-	 *
-	 * @return String
-	 */
 	protected function MyTabName() {
 		$code = preg_replace("/[^a-zA-Z0-9\s]/", " ", Config::inst()->get("AdvertisementAdmin", "menu_title"));
 		$code = str_replace(" ", "", $code);
 		return "Root.".$code;
 	}
 
-	/**
-	 *
-	 * @return LiteralField
-	 */
 	protected function MyHeaderField($title) {
 		$code = preg_replace("/[^a-zA-Z0-9\s]/", "", $title);
 		$code = str_replace(" ", "", $code);
 		return new LiteralField($code, "<h4 style='margin-top: 20px'>$title</h4>");
 	}
 
+	function AdvertisementSet($style = null) {
+		if($this->classHasAdvertisements($this->owner->ClassName)) {
+			$browseSet = $this->owner->advertisementsToShow();
+			if($browseSet) {
+				$file = null;
+				if($this->owner->AdvertisementStyleID) {
+					$style = $this->owner->AdvertisementStyle();
+				}
+				if($style) {
+					$file = $style->FileLocation;
+				}
+				self::add_requirements($file);
+
+				return $browseSet;
+			}
+		}
+	}
+
+	protected function advertisementParent() {
+		$parent = null;
+		if($this->owner->ParentID) {
+			$parent = SiteTree::get()->byID($this->owner->ParentID);
+		}
+		elseif($this->owner->URLSegment != "home") {
+			$parent = SiteTree::get()->where("URLSegment = 'home' AND \"ClassName\" <> 'RedirectorPage'")->First();
+			if(!$parent) {
+				if(class_exists("HomePage")) {
+					$parent = HomePage::get()->First();
+				}
+				else {
+					$parent = Page::get()->filter(array("URLSegment" => "home"))->First();
+				}
+			}
+		}
+		if($parent) {
+			if($this->classHasAdvertisements($parent->ClassName)) {
+				return $parent;
+			}
+		}
+	}
 
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-		if(self::class_has_advertisements($this->owner->ClassName)) {
+		$bt = defined('DB::USE_ANSI_SQL') ? "\"" : "`";
+		if($this->classHasAdvertisements($this->owner->ClassName)) {
 			$objects = array(0 => 0);
 			$images = array(0 => 0);
-			$dos1 = $this->myAdvertisementSet();
+			$dos1 = $this->advertisementsToShow();
 			if($dos1) {
 				foreach($dos1 as $obj) {
 					$images[$obj->ID] = $obj->AdvertisementImageID;
@@ -278,7 +285,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			}
 			//remove advdertisements if parent is being used...
 			if($this->owner->UseParentAdvertisements) {
-				if($this->owner->advertisementParent()) {
+				if($this->advertisementParent()) {
 					$combos = $this->owner->Advertisements();
 					if($combos) {
 						$combos->removeAll();
@@ -291,124 +298,27 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		}
 	}
 
-
-
-
-
-	###########################
-	# template functions
-	###########################
-
-
-	/**
-	 * caching
-	 * @var Array
-	 */
-	private static $_advertisements_set_cache = array();
-
-	/**
-	 * returns the set of Advertisements that actually needs to be shown ...
-	 * taking into account if we show parents of the current ones.
-	 *
-	 * @param AdvertisementStyle
-	 *
-	 * @return DataList
-	 */
-	public function AdvertisementSet($style = null) {
+	public function advertisementsToShow() {
 		if($this->owner->UseParentAdvertisements) {
 			$parent = $this->owner->advertisementParent();
 			if($parent) {
-				return $parent->AdvertisementSet($style);
+				return $parent->advertisementsToShow();
 			}
 		}
-		if(!isset(self::$_advertisements_set_cache[$this->owner->ID])) {
-			self::$_advertisements_set_cache[$this->owner->ID] = $this->owner->myAdvertisementSet();
-		}
-		$file = null;
-		if($style) {
-			$file = $style->FileLocation;
-		}
-		else{
-			if($this->owner->AdvertisementStyleID) {
-				$style = $this->owner->AdvertisementStyle();
-			}
-		}
-		if(self::$_advertisements_set_cache[$this->owner->ID] instanceof DataList) {
-			$this->addRequirements($file, self::$_advertisements_set_cache[$this->owner->ID]->count());
-		}
-		return self::$_advertisements_set_cache[$this->owner->ID];
+		return $this->owner->Advertisements();
 	}
 
-	/**
-	 * parent page to used for parent Advertisements
-	 * walks up the three to find the right parent for the advertisements.
-	 * return SiteTree | NULL
-	 */
-	public function advertisementParent() {
-		$parent = null;
-		if($this->owner->ParentID) {
-			$parent = SiteTree::get()->byID($this->owner->ParentID);
-		}
-		elseif($this->owner->URLSegment != "home") {
-			$parent = SiteTree::get()->where("URLSegment = 'home' AND \"ClassName\" <> 'RedirectorPage'")->First();
-			if(!$parent) {
-				if(class_exists("HomePage")) {
-					$parent = HomePage::get()->First();
-				}
-				else {
-					$parent = Page::get()->filter(array("URLSegment" => "home"))->First();
-				}
-			}
-		}
-		if($parent) {
-			if(self::class_has_advertisements($parent->ClassName)) {
-				return $parent;
-			}
-		}
+	/*
+	protected function getResizedAdvertisements(){
+
 	}
+	*/
 
-
-	/**
-	 * caching
-	 * @var Array
-	 */
-	private static $_my_advertisement_set_cache = array();
-
-	/**
-	 * returns the set of Advertisements for this owner
-	 * which may not necesarily be the actual set to show
-	 *
-	 *
-	 * @return DataList | false
-	 */
-	public function myAdvertisementSet() {
-		if(isset(self::$_my_advertisement_set_cache[$this->owner->ID]) && self::$_my_advertisement_set_cache[$this->owner->ID]) {
-			//do nothing
-		}
-		else {
-			if(self::class_has_advertisements($this->owner->ClassName)) {
-				self::$_my_advertisement_set_cache[$this->owner->ID] = false;
-				//retrieve from Database
-				$browseSet = $this->owner->Advertisements();
-				if($browseSet && $browseSet->count()) {
-					self::$_my_advertisement_set_cache[$this->owner->ID] = $browseSet;
-				}
-			}
-		}
-		return self::$_my_advertisement_set_cache[$this->owner->ID];
-	}
-
-	/**
-	 * assumptions:
-	 * 1. in general YES
-	 * 2. if list of WITH is shown then it must be in that
-	 * 3. otherwise check if it is specifically excluded (WITHOUT)
-	 *
-	 * @param String $classname
-	 *
-	 * @return Boolean
-	 */
-	protected static function class_has_advertisements($className) {
+	protected function classHasAdvertisements($className) {
+		//assumptions:
+		//1. in general YES
+		//2. if list of WITH is shown then it must be in that
+		//3. otherwise check if it is specifically excluded (WITHOUT)
 		$result = true;
 		$inc =  Config::inst()->get("AdvertisementDecorator","page_classes_with_advertisements");
 		$exc =  Config::inst()->get("AdvertisementDecorator","page_classes_without_advertisements");
