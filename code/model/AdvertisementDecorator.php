@@ -85,9 +85,17 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$advertisements = $this->owner->Advertisements()->where($where);
 			$txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get("Advertisement", "plural_name"));
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
-			$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... (list below shows all slides available, but on the ticked ones are shown.)'), Config::inst()->get("Advertisement", "plural_name"));
+			$txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get("Advertisement", "plural_name"));
 			$advertisementsGridField = new GridField('Advertisements',  $txt,  $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
 			$fields->addFieldToTab($tabName, $advertisementsGridField);
+			if(Config::inst()->get("Advertisement", "resize_images") == 'no') {
+				$totalSize = 0;
+				foreach($this->owner->Advertisements() as $advertisement) {
+					$totalSize += $advertisement->AdvertisementImage()->getAbsoluteSize();
+				}
+				$seconds = round($totalSize + 1 / ((1024 *1024) / 2));
+				$fields->addFieldToTab($tabName, new LiteralField("TotalSize", '<h2>Total download size: '.File::format_size($totalSize).', on a good reception 3G network that would take around '.$seconds.' seconds.</h2>'));
+			}
 			if(class_exists("DataObjectSorterController")) {
 				$shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
 				if($shownAdvertisements) {
@@ -166,18 +174,17 @@ class AdvertisementDecorator extends SiteTreeExtension {
 			$fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
 			$page = SiteTree::get()->byID($this->owner->ID);
 
-			$txtRemove = sprintf(_t("AdvertisementDecorator.REMOVE", 'Remove all %1$s from this page (%1$s will not be deleted)'), Config::inst()->get("Advertisement", "plural_name"));
+			$txtRemove = sprintf(_t("AdvertisementDecorator.REMOVE", 'Remove all %1$s from this page (%1$s will not be deleted but are not longer associated with this page)'), Config::inst()->get("Advertisement", "plural_name"));
 			$txtConfirmRemove = sprintf(_t("AdvertisementDecorator.CONFIRMREMOVE", 'Are you sure you want to remove all %1$s from this page?'), Config::inst()->get("Advertisement", "plural_name"));
 			$removeallLink = 'advertisements/removealladvertisements/'.$this->owner->ID.'/';
 			$jquery = 'if(confirm(\''.$txtConfirmRemove.'\')) {jQuery(\'#removealladvertisements\').load(\''.$removeallLink.'\');} return false;';
 			$fields->addFieldToTab($tabName, new LiteralField("removealladvertisements", '<p class="message warning"><a href="'.$removeallLink.'" onclick="'.$jquery.'"  id="removealladvertisements"  class="ss-ui-button">'.$txtRemove.'</a></p>'));
 
-			$txtDelete = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete all %1$s from from this website (but not the images associated with them)'), Config::inst()->get("Advertisement", "plural_name"));
+			$txtDelete = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete all %1$s from this website (but not the images associated with them)'), Config::inst()->get("Advertisement", "plural_name"));
 			$txtConfirmDelete = sprintf(_t("AdvertisementDecorator.CONFIRMDELETE", 'Are you sure you want to delete all %1$s - there is no UNDO?'), Config::inst()->get("Advertisement", "plural_name"));
 			$deleteallLink = 'advertisements/deletealladvertisements/'.$this->owner->ID.'/';
 			$jquery = 'if(confirm(\''.$txtConfirmDelete.'\')) {jQuery(\'#deletealladvertisements\').load(\''.$deleteallLink.'\');} return false;';
 			$fields->addFieldToTab($tabName, new LiteralField("deletealladvertisements", '<p class="message bad"><a href="'.$deleteallLink.'" onclick="'.$jquery.'"  id="deletealladvertisements" class="ss-ui-button">'.$txtDelete.'</a></p>'));
-
 		}
 		return $fields;
 	}

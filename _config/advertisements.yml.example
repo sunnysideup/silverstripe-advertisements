@@ -20,7 +20,7 @@ Advertisement:
   plural_name: Slides
   width: 100
   height: 100
-  resize_images: true
+  resize_images: 'yes'
 
 #ADVANCED OPTION 1
 AdvertisementStyle:

@@ -13,7 +13,11 @@ class Advertisement extends DataObject {
 
 	private static $height = 0;
 
-	private static $resize_images = true;
+	/**
+	 * must be a string as booleans dont work well on configs
+	 * @varchar yes / no
+	 */
+	private static $resize_images = "yes";
 
 	public static function recommended_image_size_statement() {
 		$array = array();
@@ -165,7 +169,7 @@ class Advertisement extends DataObject {
 		$fields->addFieldToTab("Root.OptionalLink", new TreeDropdownField($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = "SiteTree"));
 		$fields->addFieldToTab("Root.OptionalLink", new CheckboxField($name = "RemoveInternalLink", $title = _t("Advertisement.RemoveInternalLink", "remove internal link")));
 		if(class_exists("DataObjectSorterController")) {
-			$fields->addFieldToTab("Root.Position", new LiteralField("AdvertisementsSorter", DataObjectSorterController::popup_link("Advertisement", $filterField = "", $filterValue = "", $linkText = "Sort ".Advertisement::$plural_name, $titleField = "FullTitle")));
+			//sorted on parent page...
 		}
 		else {
 			$fields->addFieldToTab(
@@ -227,7 +231,7 @@ class Advertisement extends DataObject {
 		$resizedImage = null;
 		$imageID = intval($this->AdvertisementImageID+ 0);
 		if($imageID) {
-			if($this->Config()->get("resize_images")) {
+			if($this->Config()->get("resize_images") == 'yes') {
 				$imageObject = Image::get()->byID($imageID);
 				$resizedImage = $imageObject;
 				if($imageObject) {
