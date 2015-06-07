@@ -94,7 +94,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 					$totalSize += $advertisement->AdvertisementImage()->getAbsoluteSize();
 				}
 				$seconds = round(($totalSize + 1) / 524288)	;
-				$fields->addFieldToTab($tabName, new LiteralField("TotalSize", '<h2>Total download size: '.File::format_size($totalSize).', on a good reception 3G network that would take around '.$seconds.' seconds.</h2>'));
+				$fields->addFieldToTab($tabName, new LiteralField("TotalSize", '<h2>Total download size: '.File::format_size($totalSize).', good reception 3G network download time ~'.$seconds.' seconds.</h2>'));
 			}
 			if(class_exists("DataObjectSorterController")) {
 				$shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
