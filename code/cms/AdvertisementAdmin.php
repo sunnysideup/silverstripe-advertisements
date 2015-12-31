@@ -5,15 +5,14 @@
  * @description: manage cards
  **/
 
-class AdvertisementAdmin extends ModelAdmin {
+class AdvertisementAdmin extends ModelAdmin
+{
 
-	public $showImportForm = false;
+    public $showImportForm = false;
 
-	private static $managed_models = array('Advertisement');
+    private static $managed_models = array('Advertisement');
 
-	private static $url_segment = 'ads';
+    private static $url_segment = 'ads';
 
-	private static $menu_title = 'Ads / Slides';
-
+    private static $menu_title = 'Ads / Slides';
 }
-
