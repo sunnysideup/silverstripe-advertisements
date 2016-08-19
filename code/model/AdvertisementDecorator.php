@@ -67,7 +67,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 	private static $advertisements_dos = null;
 
 	public function updateCMSFields(FieldList $fields) {
-		if($this->classHasAdvertisements($this->owner->ClassName)) {
+		if($this->classHasAdvertisements($this->owner->ClassName)  && $this->owner->exists()) {
 			$tabName = $this->MyTabName();
 			//advertisements shown...
 			$where = '1 = 1';
