@@ -205,6 +205,7 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		if($this->classHasAdvertisements($this->owner->ClassName)) {
 			$browseSet = $this->owner->advertisementsToShow();
 			if($browseSet) {
+
 				$file = null;
 				if($this->owner->AdvertisementStyleID) {
 					$style = $this->owner->AdvertisementStyle();
@@ -312,7 +313,14 @@ class AdvertisementDecorator extends SiteTreeExtension {
 				return $parent->advertisementsToShow();
 			}
 		}
-		return $this->owner->Advertisements();
+		$objects1 = $this->owner->Advertisements();
+		$objects2 = Advertisement::get()
+			->leftJoin('SiteTree_Advertisements', 'Advertisement.ID = AdvertisementID')
+			->where('AdvertisementID IS NULL');
+
+		$array = $objects1->map('ID', 'ID')->toArray();
+		$array += $objects2->map('ID', 'ID')->toArray();
+		return Advertisement::get()->filter(array('ID' => $array));
 	}
 
 	/*
