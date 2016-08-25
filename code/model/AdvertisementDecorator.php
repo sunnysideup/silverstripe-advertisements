@@ -317,8 +317,10 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		$objects2 = Advertisement::get()
 			->leftJoin('SiteTree_Advertisements', 'Advertisement.ID = AdvertisementID')
 			->where('AdvertisementID IS NULL');
-
-		$array = $objects1->map('ID', 'ID')->toArray();
+		$array = array();
+		if(is_array($objects1)){
+			$array += $objects1->map('ID', 'ID')->toArray();
+		}
 		$array += $objects2->map('ID', 'ID')->toArray();
 		return Advertisement::get()->filter(array('ID' => $array));
 	}
