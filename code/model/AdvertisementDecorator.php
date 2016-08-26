@@ -306,22 +306,34 @@ class AdvertisementDecorator extends SiteTreeExtension {
 		}
 	}
 
-	public function advertisementsToShow() {
-		if($this->owner->UseParentAdvertisements) {
-			$parent = $this->owner->advertisementParent();
-			if($parent) {
-				return $parent->advertisementsToShow();
+	/**
+	 *
+	 *
+	 * @return DataList
+	 */
+	public function advertisementsToShow()
+	{
+		$array = array(0 => 0);
+		if($this->owner->exists()) {
+			if($this->owner->UseParentAdvertisements) {
+				$parent = $this->owner->advertisementParent();
+				if($parent) {
+					return $parent->advertisementsToShow();
+				}
+			}
+			//from page
+			$objects1 = $this->owner->Advertisements();
+			if($objects1->count()) {
+				$array += $objects1->map('ID', 'ID')->toArray();
+			}
+			//shown on all pages ...
+			$objects2 = Advertisement::get()
+				->leftJoin('SiteTree_Advertisements', 'Advertisement.ID = AdvertisementID')
+				->where('AdvertisementID IS NULL');
+			if($objects2->count()) {
+				$array += $objects2->map('ID', 'ID')->toArray();
 			}
 		}
-		$objects1 = $this->owner->Advertisements();
-		$objects2 = Advertisement::get()
-			->leftJoin('SiteTree_Advertisements', 'Advertisement.ID = AdvertisementID')
-			->where('AdvertisementID IS NULL');
-		$array = array();
-		if(is_array($objects1)){
-			$array += $objects1->map('ID', 'ID')->toArray();
-		}
-		$array += $objects2->map('ID', 'ID')->toArray();
 		return Advertisement::get()->filter(array('ID' => $array));
 	}
 
