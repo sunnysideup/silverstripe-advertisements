@@ -7,11 +7,35 @@
 
 class Advertisement extends DataObject
 {
+    /**
+     *
+     * @var int
+     */
     private static $thumbnail_size = 140;
 
+    /**
+     *
+     * @var int
+     */
     private static $width = 0;
 
+    /**
+     *
+     * @var int
+     */
     private static $height = 0;
+
+    /**
+     *
+     * @var bool
+     */
+    private static $show_title = false;
+
+    /**
+     *
+     * @var bool
+     */
+    private static $show_description = false;
 
     /**
      * must be a string as booleans dont work well on configs
@@ -19,6 +43,10 @@ class Advertisement extends DataObject
      */
     private static $resize_images = "yes";
 
+    /**
+     *
+     * @return string
+     */
     public static function recommended_image_size_statement()
     {
         $array = array();
@@ -35,6 +63,7 @@ class Advertisement extends DataObject
             return _t("Advertisement.RECOMMENDED_SIZE", "Recommended Size").": ".implode(" "._t("Advertisement.AND", "and")." ", $array).".";
         }
     }
+
 
     private static $db = array(
         "Title" => "Varchar(255)",
@@ -78,6 +107,21 @@ class Advertisement extends DataObject
         "Link" => "Link"
     );
 
+
+    /**
+     * @alias getLink
+     * @return string
+     */
+    public function Link()
+    {
+        return $this->getLink();
+    }
+
+
+    /**
+     *
+     * @return string
+     */
     public function getLink()
     {
         $link = '';
@@ -91,11 +135,11 @@ class Advertisement extends DataObject
         return $link;
     }
 
-    public function Link()
-    {
-        return $this->getLink();
-    }
 
+    /**
+     *
+     * @return HTMLText
+     */
     public function getFullTitle()
     {
         $s = $this->Title;
@@ -111,11 +155,19 @@ class Advertisement extends DataObject
         return DBField::create_field("HTMLText", $s);
     }
 
+    /**
+     *
+     * @return HTMLText
+     */
     public function FullTitle()
     {
         return $this->getFullTitle();
     }
 
+    /**
+     *
+     * @return int | null
+     */
     public function getGroupID()
     {
         if ($this->AdvertisementImageID) {
@@ -126,6 +178,10 @@ class Advertisement extends DataObject
         }
     }
 
+    /**
+     *
+     * @return int | null
+     */
     public function GroupID()
     {
         return $this->getGroupID();
@@ -141,6 +197,15 @@ class Advertisement extends DataObject
         $fields->removeFieldFromTab("Root.Main", "ExternalLink");
         $fields->removeFieldFromTab("Root.Parents", "Parents");
         $fields->removeFieldFromTab("Root", "Parents");
+
+        if(! $this->ShowTitle()) {
+            $fields->removeFieldFromTab("Root", "Title");
+        }
+
+        if(! $this->ShowDescription()) {
+            $fields->removeFieldFromTab("Root", "Description");
+        }
+
         $fields->addFieldToTab("Root.Main", ReadonlyField::create("Link", 'Calculated Link'));
         $fields->addFieldToTab("Root.Main", $mainImageField = new UploadField($name = "AdvertisementImage", $title = $this->i18n_singular_name()));
         $mainImageField->setRightTitle(self::recommended_image_size_statement());
@@ -185,6 +250,7 @@ class Advertisement extends DataObject
             $sortField->setRightTitle(_t("Advertisement.SORT_EXPLANATION", "the lower the number, the earlier it shows"));
         }
         $fields->removeFieldFromTab("Root.Main", "AlternativeSortNumber");
+
         return $fields;
     }
 
@@ -205,6 +271,10 @@ class Advertisement extends DataObject
     }
 
 
+    /**
+     *
+     * @return bool
+     */
     protected function callbackFilterFunctionForMultiSelect()
     {
         $inc = Config::inst()->get("AdvertisementDecorator", "page_classes_with_advertisements");
@@ -227,8 +297,10 @@ class Advertisement extends DataObject
         return $this->ResizedAdvertisementImage();
     }
 
-
-    //back-up function...
+    /**
+     *
+     * @return Image | null
+     */
     public function ResizedAdvertisementImage()
     {
         $resizedImage = null;
@@ -263,6 +335,7 @@ class Advertisement extends DataObject
         } else {
             //debug::show("no imageID ($imageID) ");
         }
+
         return $resizedImage;
     }
 
@@ -270,4 +343,23 @@ class Advertisement extends DataObject
     {
         return "This function has not been implemented";
     }
+
+    /**
+     *
+     * @return bool
+     */
+    public function ShowTitle()
+    {
+        return $this->Config()->get('show_title');
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function ShowDescription()
+    {
+        return $this->Config()->get('show_description');
+    }
+
 }

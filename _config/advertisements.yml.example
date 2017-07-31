@@ -21,6 +21,8 @@ Advertisement:
   width: 100
   height: 100
   resize_images: 'yes'
+  show_description: true
+  show_title: true
 
 #ADVANCED OPTION 1
 AdvertisementStyle:
