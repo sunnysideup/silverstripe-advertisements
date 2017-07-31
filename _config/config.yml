@@ -1,11 +1,15 @@
 ---
 Name: advertisements
 Before: 'mysite/*'
-After: 'framework/*','cms/*'
+After:
+    - 'framework/*'
+    - 'cms/*'
 ---
 SiteTree:
   extensions:
     - AdvertisementDecorator
+
+
 ---
 Only:
   classexists: 'DataObjectSorterDOD'
