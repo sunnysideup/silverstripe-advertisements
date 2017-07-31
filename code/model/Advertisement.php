@@ -141,19 +141,19 @@ class Advertisement extends DataObject
         $fields->removeFieldFromTab("Root.Main", "ExternalLink");
         $fields->removeFieldFromTab("Root.Parents", "Parents");
         $fields->removeFieldFromTab("Root", "Parents");
-        $fields->addFieldToTab("Root.Main", new ReadonlyField("Link"));
+        $fields->addFieldToTab("Root.Main", ReadonlyField::create("Link", 'Calculated Link'));
         $fields->addFieldToTab("Root.Main", $mainImageField = new UploadField($name = "AdvertisementImage", $title = $this->i18n_singular_name()));
         $mainImageField->setRightTitle(self::recommended_image_size_statement());
         $fields->addFieldToTab(
             "Root.Main",
-            $additionalImageField =new UploadField(
+            $additionalImageField = UploadField::create(
                 $name = "AdditionalImage",
                 $title = $this->i18n_singular_name()." "._t("Advertisement.ADDITIONAL_IMAGE", "additional image")
             )
         );
         $additionalImageField->setRightTitle(self::recommended_image_size_statement());
         if ($this->ID) {
-            $treeField = new TreeMultiselectField(
+            $treeField = TreeMultiselectField::create(
                 "Parents",
                 _t("Advertisement.GETCMSFIELDSPARENTID", "only show on ... (leave blank to show on all "
                     .$this->i18n_singular_name()
@@ -171,14 +171,13 @@ class Advertisement extends DataObject
             $externalLinkField = new TextField($name = "ExternalLink", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINK", "link to external site"))
         );
         $externalLinkField->setRightTitle(_t("Advertisement.GETCMSFIELDSEXTERNALLINK_EXPLANATION", "(e.g. http://www.wikipedia.org) - this will override an internal link"));
-        $fields->addFieldToTab("Root.OptionalLink", new TreeDropdownField($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = "SiteTree"));
-        $fields->addFieldToTab("Root.OptionalLink", new CheckboxField($name = "RemoveInternalLink", $title = _t("Advertisement.RemoveInternalLink", "remove internal link")));
+        $fields->addFieldToTab("Root.OptionalLink", TreeDropdownField::create($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = "SiteTree"));
         if (class_exists("DataObjectSorterController")) {
             //sorted on parent page...
         } else {
             $fields->addFieldToTab(
                 "Root.Position",
-                $sortField = new NumericField(
+                $sortField = NumericField::create(
                     "Sort",
                     _t("Advertisement.SORT", "Sort index number")
                 )
@@ -192,10 +191,7 @@ class Advertisement extends DataObject
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if (isset($_REQUEST["RemoveInternalLink"]) && $_REQUEST["RemoveInternalLink"]) {
-            $this->LinkedPageID= 0;
-        }
-        if (!$this->Sort) {
+        if (! $this->Sort) {
             $defaults = $this->Config()->get("defaults");
             $this->Sort = isset($defaults["Sort"]) ? $defaults["Sort"] : 0;
         }
