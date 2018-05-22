@@ -19,7 +19,8 @@ class AdvertisementController extends Controller
         DB::query("UPDATE SiteTree SET AdvertisementsFolderID = 0 WHERE SiteTree.ID = ".$id);
         DB::query("UPDATE SiteTree_Live SET AdvertisementsFolderID = 0 WHERE SiteTree_Live.ID = ".$id);
         return sprintf(
-            _t("AdvertisementController.REMOVEDALL", 'Removed all %1$s from this page, please reload page to see results.'), Config::inst()->get("Advertisement", "plural_name")
+            _t("AdvertisementController.REMOVEDALL", 'Removed all %1$s from this page, please reload page to see results.'),
+            Config::inst()->get("Advertisement", "plural_name")
         );
     }
 
@@ -27,7 +28,8 @@ class AdvertisementController extends Controller
     {
         DB::query("DELETE FROM \"Advertisement\"");
         return sprintf(
-            _t("AdvertisementController.DELETEDALL", 'Deleted all %1$s from this website, please reload page to see results.'), Config::inst()->get("Advertisement", "plural_name")
+            _t("AdvertisementController.DELETEDALL", 'Deleted all %1$s from this website, please reload page to see results.'),
+            Config::inst()->get("Advertisement", "plural_name")
         );
     }
 }

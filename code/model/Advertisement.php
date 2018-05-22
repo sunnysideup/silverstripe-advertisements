@@ -198,11 +198,11 @@ class Advertisement extends DataObject
         $fields->removeFieldFromTab("Root.Parents", "Parents");
         $fields->removeFieldFromTab("Root", "Parents");
 
-        if(! $this->ShowTitle()) {
+        if (! $this->ShowTitle()) {
             $fields->removeFieldFromTab("Root", "Title");
         }
 
-        if(! $this->ShowDescription()) {
+        if (! $this->ShowDescription()) {
             $fields->removeFieldFromTab("Root", "Description");
         }
 
@@ -361,5 +361,4 @@ class Advertisement extends DataObject
     {
         return $this->Config()->get('show_description');
     }
-
 }

@@ -86,7 +86,7 @@ class AdvertisementDecorator extends SiteTreeExtension
             $txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get("Advertisement", "plural_name"));
             $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
             $txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get("Advertisement", "plural_name"));
-            $advertisementsGridField = new GridField('Advertisements',  $txt,  $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
+            $advertisementsGridField = new GridField('Advertisements', $txt, $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
             $fields->addFieldToTab($tabName, $advertisementsGridField);
             if (Config::inst()->get("Advertisement", "resize_images") == 'no') {
                 $totalSize = 0;
@@ -273,7 +273,7 @@ class AdvertisementDecorator extends SiteTreeExtension
             if ($this->owner->AdvertisementsFolderID) {
                 $dos2 = Image::get()
                     ->where("\"File\".\"ParentID\" = ".$this->owner->AdvertisementsFolderID." AND \"Advertisement\".\"AdvertisementImageID\" IS NULL ")
-                    ->leftJoin("Advertisement",  "\"Advertisement\".\"AdvertisementImageID\" = \"File\".\"ID\" ");
+                    ->leftJoin("Advertisement", "\"Advertisement\".\"AdvertisementImageID\" = \"File\".\"ID\" ");
                 if ($dos2->count()) {
                     $advertisementsToAdd = array();
                     foreach ($dos2 as $image) {
