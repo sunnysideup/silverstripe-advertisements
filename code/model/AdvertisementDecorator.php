@@ -81,12 +81,25 @@ class AdvertisementDecorator extends SiteTreeExtension
                 }
             }
 
+            $source = Advertisement::get();
+            if ($source && $source->count()) {
+                $newSource = [];
+                foreach ($source as $ad) {
+                    $newSource[$ad->ID] = $ad->getFullTitle('width: 75px!important;');
+                }
+                $fields->addFieldToTab($tabName, CheckboxSetField::create(
+                    'Advertisements',
+                    'Select '.Config::inst()->get("Advertisement", "plural_name"),
+                    $newSource
+                ));
+            }
+
             //$advertisementsCount = DB::query("SELECT COUNT(ID) FROM \"Advertisement\" $whereDB ;")->value();
             $advertisements = $this->owner->Advertisements()->where($where);
             $txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get("Advertisement", "plural_name"));
             $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
             $txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get("Advertisement", "plural_name"));
-            $advertisementsGridField = new GridField('Advertisements', $txt, $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
+            $advertisementsGridField = new GridField('AdvertisementsList', $txt, $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
             $fields->addFieldToTab($tabName, $advertisementsGridField);
             if (Config::inst()->get("Advertisement", "resize_images") == 'no') {
                 $totalSize = 0;
@@ -119,6 +132,10 @@ class AdvertisementDecorator extends SiteTreeExtension
                 $txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Config::inst()->get("Advertisement", "plural_name"), $parent->Title);
                 $fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", $txt));
             }
+
+
+            $txt = _t('AdvertisementDecorator.ADVANCED', 'Advanced');
+            $fields->addFieldToTab($tabName, $this->MyHeaderFieldLarge($txt));
 
             //create new advertisements
             $txt = sprintf(_t("AdvertisementDecorator.CREATE", 'Create new %1$s'), Config::inst()->get("Advertisement", "plural_name"));
@@ -159,8 +176,8 @@ class AdvertisementDecorator extends SiteTreeExtension
                 $selectStyleField->setRightTitle(_t("AdvertisementDecorator.STYLECREATED_EXPLANATION", "Styles are created by your developer"));
             }
 
+
             $txt = sprintf(_t("AdvertisementDecorator.EDIT", 'Edit %1$s'), Config::inst()->get("Advertisement", "plural_name"));
-            $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
             $txt = sprintf(
                 _t("AdvertisementDecorator.PLEASEMANAGEEXISTING", '<p>Please manage existing %1$s on the <a href="admin/%2$s/">%3$s tab</a>.</p>'),
                 Config::inst()->get("Advertisement", "plural_name"),
@@ -184,7 +201,7 @@ class AdvertisementDecorator extends SiteTreeExtension
             $jquery = 'if(confirm(\''.$txtConfirmDelete.'\')) {jQuery(\'#deletealladvertisements\').load(\''.$deleteallLink.'\');} return false;';
             $fields->addFieldToTab($tabName, new LiteralField("deletealladvertisements", '<p class="message bad"><a href="'.$deleteallLink.'" onclick="'.$jquery.'"  id="deletealladvertisements" class="ss-ui-button">'.$txtDelete.'</a></p>'));
         }
-        
+
         return $fields;
     }
 
@@ -200,6 +217,13 @@ class AdvertisementDecorator extends SiteTreeExtension
         $code = preg_replace("/[^a-zA-Z0-9\s]/", "", $title);
         $code = str_replace(" ", "", $code);
         return new LiteralField($code, "<h4 style='margin-top: 20px'>$title</h4>");
+    }
+
+    protected function MyHeaderFieldLarge($title)
+    {
+        $code = preg_replace("/[^a-zA-Z0-9\s]/", "", $title);
+        $code = str_replace(" ", "", $code);
+        return new LiteralField($code, "<h2 style='margin-top: 40px'>$title</h2>");
     }
 
     public function AdvertisementSet($style = null)

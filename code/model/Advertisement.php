@@ -140,7 +140,7 @@ class Advertisement extends DataObject
      *
      * @return HTMLText
      */
-    public function getFullTitle()
+    public function getFullTitle($additionalStyle = '')
     {
         $s = $this->Title;
         if ($this->AdvertisementImageID) {
@@ -148,7 +148,8 @@ class Advertisement extends DataObject
             if ($image && $image->exists()) {
                 $thumb = $image->setSize(Config::inst()->get("Advertisement", "thumbnail_size"), Config::inst()->get("Advertisement", "thumbnail_size"));
                 if ($thumb) {
-                    $s = " <img src=\"".$thumb->Link()."\" title=\"".$thumb->Link()."\"/ style=\"vertical-align: top; display: block; float: left; padding-right: 10px; \"><div style=\"width: 100%;\">".$s."</div><div style=\"clear: left;\"></div>";
+                    $s = '
+                        <img src="'.$thumb->Link().'" title="'.$thumb->Link().'"/ style="vertical-align: top; display: block; float: left; padding-right: 10px; '.$additionalStyle.' "><div style="width: 100%;">'.$s.'</div><div style="clear: left;"></div>';
                 }
             }
         }
