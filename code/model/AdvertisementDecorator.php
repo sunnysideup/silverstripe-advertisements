@@ -17,6 +17,14 @@ class AdvertisementDecorator extends SiteTreeExtension
      */
     private static $alternative_javascript_file_array = array();
 
+    /**
+     * load an alternative collection of JS file to power your
+     * slideslow
+     * see yml files for example
+     * @var Array
+     */
+    private static $add_advertisements_shown_on_no_pages_to_all_pages = true;
+
     public static function add_requirements($alternativeFileLocation = null)
     {
         Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
@@ -350,12 +358,14 @@ class AdvertisementDecorator extends SiteTreeExtension
             if ($objects1->count()) {
                 $array += $objects1->map('ID', 'ID')->toArray();
             }
-            //shown on all pages ...
-            $objects2 = Advertisement::get()
-                ->leftJoin('SiteTree_Advertisements', 'Advertisement.ID = AdvertisementID')
-                ->where('AdvertisementID IS NULL');
-            if ($objects2->count()) {
-                $array += $objects2->map('ID', 'ID')->toArray();
+            if (Config::inst()->get(self::class, 'add_advertisements_shown_on_no_pages_to_all_pages')) {
+                //shown on all pages ...
+                $objects2 = Advertisement::get()
+                    ->leftJoin('SiteTree_Advertisements', 'Advertisement.ID = AdvertisementID')
+                    ->where('AdvertisementID IS NULL');
+                if ($objects2->count()) {
+                    $array += $objects2->map('ID', 'ID')->toArray();
+                }
             }
         }
         return Advertisement::get()->filter(array('ID' => $array));
