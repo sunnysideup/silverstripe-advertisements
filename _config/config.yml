@@ -1,6 +1,6 @@
 ---
 Name: advertisements
-Before: 'mysite/*'
+Before: 'app/*'
 After:
     - 'framework/*'
     - 'cms/*'

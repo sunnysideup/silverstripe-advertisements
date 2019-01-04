@@ -27,7 +27,7 @@ class AdvertisementDecorator extends SiteTreeExtension
 
     public static function add_requirements($alternativeFileLocation = null)
     {
-        Requirements::javascript(THIRDPARTY_DIR."/jquery/jquery.js");
+        Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
         $jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
 
         if (count($jsFileArray)) {
