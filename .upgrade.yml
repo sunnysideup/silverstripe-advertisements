@@ -1,0 +1,6 @@
+mappings:
+  AdvertisementController: Sunnysideup\Advertisements\Control\AdvertisementController
+  AdvertisementAdmin: Sunnysideup\Advertisements\Cms\AdvertisementAdmin
+  AdvertisementDecorator: Sunnysideup\Advertisements\Model\AdvertisementDecorator
+  AdvertisementStyle: Sunnysideup\Advertisements\Model\AdvertisementStyle
+  Advertisement: Sunnysideup\Advertisements\Model\Advertisement

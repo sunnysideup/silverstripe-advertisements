@@ -1,6 +1,6 @@
 {
     "name": "sunnysideup/advertisements",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "description": "Uses the jQuery extension cycle to create advertisements / slides ",
     "keywords": [
         "Silverstripe-CMS",
@@ -23,10 +23,9 @@
     ],
     "require": {
         "silverstripe/framework": "~3.6",
-        "silverstripe/cms": "~3.6",
-        "sunnysideup/dataobjectsorter": "*"
+        "sunnysideup/dataobjectsorter": "*",
+        "composer/installers": "^1.6",
+        "silverstripe/recipe-cms": "^4.2"
     },
-    "extra": {
-        "installer-name": "advertisements"
-    }
+    "extra": []
 }

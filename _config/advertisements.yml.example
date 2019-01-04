@@ -2,7 +2,7 @@
 # Start advertisements
 ###################################
 
-# if true, this will search for myproject/javascript/AdvertisementsExecutive.js | myproject is usually called mysite.
+# if true, this will search for myproject/javascript/AdvertisementsExecutive.js | myproject is usually called app.
 AdvertisementDecorator:
   use_custom_javascript: false
   page_classes_without_advertisements:
@@ -27,8 +27,8 @@ Advertisement:
 #ADVANCED OPTION 1
 AdvertisementStyle:
   array_of_js_file_options:
-    "slideshow style 1" : "mysite/javascript/slideshow1.js"
-    "slideshow style 2" : "mysite/javascript/slideshow1.js"
+    "slideshow style 1" : "app/javascript/slideshow1.js"
+    "slideshow style 2" : "app/javascript/slideshow1.js"
 
 #ADVANCED OPTION 2
 AdvertisementDecorator:

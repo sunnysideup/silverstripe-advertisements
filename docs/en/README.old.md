@@ -43,7 +43,7 @@ Installation Instructions
 -----------------------------------------------
 1. Find out how to add modules to SS and add module as per usual.
 
-2. Review configs and add entries to mysite/_config/config.yml
+2. Review configs and add entries to app/_config/config.yml
 (or similar) as necessary.
 In the _config/ folder of this module
 you can usually find some examples of config options (if any).
@@ -54,6 +54,6 @@ you can usually find some examples of config options (if any).
 
 4. theme CSS and make sure to set a width and a height for the slides!
 
-5. create your own js code.  If your project is called "mysite" then the location of the file should be:
+5. create your own js code.  If your project is called "app" then the location of the file should be:
 
-mysite/javascript/AdvertisementsExecutive.js
+app/javascript/AdvertisementsExecutive.js
