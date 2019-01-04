@@ -35,7 +35,7 @@ class AdvertisementDecorator extends SiteTreeExtension
                 Requirements::javascript($file);
             }
         } else {
-            Requirements::javascript("advertisements/javascript/Advertisements.js");
+            Requirements::javascript("sunnysideup/advertisements: advertisements/javascript/Advertisements.js");
             $file = "";
             $customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
             if ($customJavascript == 1) {
@@ -47,7 +47,7 @@ class AdvertisementDecorator extends SiteTreeExtension
                 $file = "advertisements/javascript/AdvertisementsExecutive.js";
             }
             Requirements::javascript($file);
-            Requirements::themedCSS("Advertisements", "advertisements");
+            Requirements::themedCSS("sunnysideup/advertisements: Advertisements", "advertisements");
         }
     }
 
