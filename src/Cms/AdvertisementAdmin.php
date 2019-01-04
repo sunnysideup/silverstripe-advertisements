@@ -2,7 +2,10 @@
 
 namespace Sunnysideup\Advertisements\Cms;
 
-use ModelAdmin;
+
+use Sunnysideup\Advertisements\Model\Advertisement;
+use SilverStripe\Admin\ModelAdmin;
+
 
 
 /**
@@ -14,7 +17,7 @@ class AdvertisementAdmin extends ModelAdmin
 {
     public $showImportForm = false;
 
-    private static $managed_models = array('Advertisement');
+    private static $managed_models = array(Advertisement::class);
 
     private static $url_segment = 'ads';
 

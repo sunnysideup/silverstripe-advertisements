@@ -2,24 +2,44 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-use SiteTreeExtension;
-use Requirements;
-use Config;
-use FieldList;
-use Image;
-use CheckboxSetField;
-use GridField;
-use GridFieldConfig_RelationEditor;
-use LiteralField;
-use File;
+
+
+
+
+
+
+
+
+
+
 use DataObjectSorterController;
-use CheckboxField;
-use Folder;
-use TreeDropdownField;
-use DropdownField;
-use SiteTree;
+
+
+
+
+
 use HomePage;
 use Page;
+use SilverStripe\View\Requirements;
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\Advertisements\Model\AdvertisementDecorator;
+use SilverStripe\Assets\Folder;
+use Sunnysideup\Advertisements\Model\AdvertisementStyle;
+use Sunnysideup\Advertisements\Model\Advertisement;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Assets\Image;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Assets\File;
+use SilverStripe\Forms\LiteralField;
+use Sunnysideup\Advertisements\Cms\AdvertisementAdmin;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\TreeDropdownField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\CMS\Model\SiteTreeExtension;
+
 
 
 /**
@@ -50,7 +70,7 @@ class AdvertisementDecorator extends SiteTreeExtension
     public static function add_requirements($alternativeFileLocation = null)
     {
         Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
-        $jsFileArray = Config::inst()->get("AdvertisementDecorator", "alternative_javascript_file_array");
+        $jsFileArray = Config::inst()->get(AdvertisementDecorator::class, "alternative_javascript_file_array");
 
         if (count($jsFileArray)) {
             foreach ($jsFileArray as $file) {
@@ -59,7 +79,7 @@ class AdvertisementDecorator extends SiteTreeExtension
         } else {
             Requirements::javascript("sunnysideup/advertisements: advertisements/javascript/Advertisements.js");
             $file = "";
-            $customJavascript = Config::inst()->get("AdvertisementDecorator", "use_custom_javascript");
+            $customJavascript = Config::inst()->get(AdvertisementDecorator::class, "use_custom_javascript");
             if ($customJavascript == 1) {
                 $file = project()."/javascript/AdvertisementsExecutive.js";
             } elseif ($alternativeFileLocation) {
@@ -78,12 +98,12 @@ class AdvertisementDecorator extends SiteTreeExtension
     );
 
     private static $has_one = array(
-        "AdvertisementsFolder" => "Folder",
-        "AdvertisementStyle" => "AdvertisementStyle"
+        "AdvertisementsFolder" => Folder::class,
+        "AdvertisementStyle" => AdvertisementStyle::class
     );
 
     private static $many_many = array(
-        "Advertisements" => "Advertisement"
+        "Advertisements" => Advertisement::class
     );
 
     private static $use_custom_javascript = false;
@@ -119,19 +139,19 @@ class AdvertisementDecorator extends SiteTreeExtension
                 }
                 $fields->addFieldToTab($tabName, CheckboxSetField::create(
                     'Advertisements',
-                    'Select '.Config::inst()->get("Advertisement", "plural_name"),
+                    'Select '.Config::inst()->get(Advertisement::class, "plural_name"),
                     $newSource
                 ));
             }
 
             //$advertisementsCount = DB::query("SELECT COUNT(ID) FROM \"Advertisement\" $whereDB ;")->value();
             $advertisements = $this->owner->Advertisements()->where($where);
-            $txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get("Advertisement", "plural_name"));
+            $txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get(Advertisement::class, "plural_name"));
             $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
-            $txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get("Advertisement", "plural_name"));
+            $txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get(Advertisement::class, "plural_name"));
             $advertisementsGridField = new GridField('AdvertisementsList', $txt, $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
             $fields->addFieldToTab($tabName, $advertisementsGridField);
-            if (Config::inst()->get("Advertisement", "resize_images") == 'no') {
+            if (Config::inst()->get(Advertisement::class, "resize_images") == 'no') {
                 $totalSize = 0;
                 foreach ($this->owner->Advertisements() as $advertisement) {
                     $totalSize += $advertisement->AdvertisementImage()->getAbsoluteSize();
@@ -144,7 +164,7 @@ class AdvertisementDecorator extends SiteTreeExtension
                 if ($shownAdvertisements) {
                     $array = $shownAdvertisements->column("ID");
                     $idString = implode(",", $array);
-                    $link = DataObjectSorterController::popup_link("Advertisement", $filterField = "ID", $filterValue = $idString, $linkText = "sort ".Config::inst()->get("Advertisement", "plural_name"), $titleField = "FullTitle");
+                    $link = DataObjectSorterController::popup_link(Advertisement::class, $filterField = "ID", $filterValue = $idString, $linkText = "sort ".Config::inst()->get(Advertisement::class, "plural_name"), $titleField = "FullTitle");
                     $fields->addFieldToTab($tabName, new LiteralField("AdvertisementsSorter", $link));
                 }
             }
@@ -152,14 +172,14 @@ class AdvertisementDecorator extends SiteTreeExtension
             } else {
                 $txt = sprintf(
                     _t("AdvertisementDecorator.CREATE", '<p>Please <a href="admin/%1$s/">create %2$s</a> on the <a href="admin/%1$s/">%3$s tab</a> first, or see below on how to create %2$s from a folder.</p>'),
-                    Config::inst()->get("AdvertisementAdmin", "url_segment"),
-                    Config::inst()->get("Advertisement", "plural_name"),
-                    Config::inst()->get("AdvertisementAdmin", "menu_title")
+                    Config::inst()->get(AdvertisementAdmin::class, "url_segment"),
+                    Config::inst()->get(Advertisement::class, "plural_name"),
+                    Config::inst()->get(AdvertisementAdmin::class, "menu_title")
                 );
                 $fields->addFieldToTab($tabName, new LiteralField("AdvertisementsHowToCreate", $txt));
             }
             if ($parent = $this->advertisementParent()) {
-                $txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Config::inst()->get("Advertisement", "plural_name"), $parent->Title);
+                $txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Config::inst()->get(Advertisement::class, "plural_name"), $parent->Title);
                 $fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", $txt));
             }
 
@@ -168,16 +188,16 @@ class AdvertisementDecorator extends SiteTreeExtension
             $fields->addFieldToTab($tabName, $this->MyHeaderFieldLarge($txt));
 
             //create new advertisements
-            $txt = sprintf(_t("AdvertisementDecorator.CREATE", 'Create new %1$s'), Config::inst()->get("Advertisement", "plural_name"));
+            $txt = sprintf(_t("AdvertisementDecorator.CREATE", 'Create new %1$s'), Config::inst()->get(Advertisement::class, "plural_name"));
             $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
             $txt = sprintf(
                 _t(
                     "AdvertisementDecorator.CREATENEWFROMFOLDER_EXPLANATION",
                     'Create New %1$s from images in the folder selected - each image in the folder will be used to create a %3$s. %2$s'
                 ),
-                Config::inst()->get("Advertisement", "plural_name"),
+                Config::inst()->get(Advertisement::class, "plural_name"),
                 Advertisement::recommended_image_size_statement(),
-                Config::inst()->get("Advertisement", "singular_name")
+                Config::inst()->get(Advertisement::class, "singular_name")
             );
             if (Folder::get()->count()) {
                 $fields->addFieldToTab(
@@ -185,7 +205,7 @@ class AdvertisementDecorator extends SiteTreeExtension
                     $treeDropdownField = new TreeDropdownField(
                         'AdvertisementsFolderID',
                         _t("AdvertisementDecorator.CREATENEWFROMFOLDER", "Create from folder"),
-                        'Folder'
+                        Folder::class
                     )
                 );
                 $treeDropdownField->setRightTitle($txt);
@@ -207,26 +227,26 @@ class AdvertisementDecorator extends SiteTreeExtension
             }
 
 
-            $txt = sprintf(_t("AdvertisementDecorator.EDIT", 'Edit %1$s'), Config::inst()->get("Advertisement", "plural_name"));
+            $txt = sprintf(_t("AdvertisementDecorator.EDIT", 'Edit %1$s'), Config::inst()->get(Advertisement::class, "plural_name"));
             $txt = sprintf(
                 _t("AdvertisementDecorator.PLEASEMANAGEEXISTING", '<p>Please manage existing %1$s on the <a href="admin/%2$s/">%3$s tab</a>.</p>'),
-                Config::inst()->get("Advertisement", "plural_name"),
-                Config::inst()->get("AdvertisementAdmin", "url_segment"),
-                Config::inst()->get("AdvertisementAdmin", "menu_title")
+                Config::inst()->get(Advertisement::class, "plural_name"),
+                Config::inst()->get(AdvertisementAdmin::class, "url_segment"),
+                Config::inst()->get(AdvertisementAdmin::class, "menu_title")
             );
             $fields->addFieldToTab($tabName, new LiteralField("ManageAdvertisements", $txt));
-            $txt = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete %1$s'), Config::inst()->get("Advertisement", "plural_name"));
+            $txt = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete %1$s'), Config::inst()->get(Advertisement::class, "plural_name"));
             $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
             $page = SiteTree::get()->byID($this->owner->ID);
 
-            $txtRemove = sprintf(_t("AdvertisementDecorator.REMOVE", 'Remove all %1$s from this page (%1$s will not be deleted but are not longer associated with this page)'), Config::inst()->get("Advertisement", "plural_name"));
-            $txtConfirmRemove = sprintf(_t("AdvertisementDecorator.CONFIRMREMOVE", 'Are you sure you want to remove all %1$s from this page?'), Config::inst()->get("Advertisement", "plural_name"));
+            $txtRemove = sprintf(_t("AdvertisementDecorator.REMOVE", 'Remove all %1$s from this page (%1$s will not be deleted but are not longer associated with this page)'), Config::inst()->get(Advertisement::class, "plural_name"));
+            $txtConfirmRemove = sprintf(_t("AdvertisementDecorator.CONFIRMREMOVE", 'Are you sure you want to remove all %1$s from this page?'), Config::inst()->get(Advertisement::class, "plural_name"));
             $removeallLink = 'advertisements/removealladvertisements/'.$this->owner->ID.'/';
             $jquery = 'if(confirm(\''.$txtConfirmRemove.'\')) {jQuery(\'#removealladvertisements\').load(\''.$removeallLink.'\');} return false;';
             $fields->addFieldToTab($tabName, new LiteralField("removealladvertisements", '<p class="message warning"><a href="'.$removeallLink.'" onclick="'.$jquery.'"  id="removealladvertisements"  class="ss-ui-button">'.$txtRemove.'</a></p>'));
 
-            $txtDelete = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete all %1$s from this website (but not the images associated with them)'), Config::inst()->get("Advertisement", "plural_name"));
-            $txtConfirmDelete = sprintf(_t("AdvertisementDecorator.CONFIRMDELETE", 'Are you sure you want to delete all %1$s - there is no UNDO?'), Config::inst()->get("Advertisement", "plural_name"));
+            $txtDelete = sprintf(_t("AdvertisementDecorator.DELETE", 'Delete all %1$s from this website (but not the images associated with them)'), Config::inst()->get(Advertisement::class, "plural_name"));
+            $txtConfirmDelete = sprintf(_t("AdvertisementDecorator.CONFIRMDELETE", 'Are you sure you want to delete all %1$s - there is no UNDO?'), Config::inst()->get(Advertisement::class, "plural_name"));
             $deleteallLink = 'advertisements/deletealladvertisements/'.$this->owner->ID.'/';
             $jquery = 'if(confirm(\''.$txtConfirmDelete.'\')) {jQuery(\'#deletealladvertisements\').load(\''.$deleteallLink.'\');} return false;';
             $fields->addFieldToTab($tabName, new LiteralField("deletealladvertisements", '<p class="message bad"><a href="'.$deleteallLink.'" onclick="'.$jquery.'"  id="deletealladvertisements" class="ss-ui-button">'.$txtDelete.'</a></p>'));
@@ -237,7 +257,7 @@ class AdvertisementDecorator extends SiteTreeExtension
 
     protected function MyTabName()
     {
-        $code = preg_replace("/[^a-zA-Z0-9\s]/", " ", Config::inst()->get("AdvertisementAdmin", "menu_title"));
+        $code = preg_replace("/[^a-zA-Z0-9\s]/", " ", Config::inst()->get(AdvertisementAdmin::class, "menu_title"));
         $code = str_replace(" ", "", $code);
         return "Root.".$code;
     }
@@ -327,7 +347,7 @@ class AdvertisementDecorator extends SiteTreeExtension
             if ($this->owner->AdvertisementsFolderID) {
                 $dos2 = Image::get()
                     ->where("\"File\".\"ParentID\" = ".$this->owner->AdvertisementsFolderID." AND \"Advertisement\".\"AdvertisementImageID\" IS NULL ")
-                    ->leftJoin("Advertisement", "\"Advertisement\".\"AdvertisementImageID\" = \"File\".\"ID\" ");
+                    ->leftJoin(Advertisement::class, "\"Advertisement\".\"AdvertisementImageID\" = \"File\".\"ID\" ");
                 if ($dos2->count()) {
                     $advertisementsToAdd = array();
                     foreach ($dos2 as $image) {
@@ -406,8 +426,8 @@ class AdvertisementDecorator extends SiteTreeExtension
         //2. if list of WITH is shown then it must be in that
         //3. otherwise check if it is specifically excluded (WITHOUT)
         $result = true;
-        $inc =  Config::inst()->get("AdvertisementDecorator", "page_classes_with_advertisements");
-        $exc =  Config::inst()->get("AdvertisementDecorator", "page_classes_without_advertisements");
+        $inc =  Config::inst()->get(AdvertisementDecorator::class, "page_classes_with_advertisements");
+        $exc =  Config::inst()->get(AdvertisementDecorator::class, "page_classes_without_advertisements");
         if (is_array($inc) && count($inc)) {
             $result = false;
             if (in_array($className, $inc)) {

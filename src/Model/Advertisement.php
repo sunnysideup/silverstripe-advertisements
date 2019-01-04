@@ -2,18 +2,34 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-use DataObject;
-use Config;
-use DBField;
-use Image;
-use ReadonlyField;
-use UploadField;
-use TreeMultiselectField;
-use TextField;
-use TreeDropdownField;
-use NumericField;
-use DB;
-use Convert;
+
+
+
+
+
+
+
+
+
+
+
+
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\Advertisements\Model\Advertisement;
+use SilverStripe\Assets\Image;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Forms\TreeMultiselectField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\TreeDropdownField;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\ORM\DB;
+use Sunnysideup\Advertisements\Model\AdvertisementDecorator;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataObject;
+
 
 
 /* *
@@ -66,11 +82,11 @@ class Advertisement extends DataObject
     public static function recommended_image_size_statement()
     {
         $array = array();
-        if (Config::inst()->get("Advertisement", "width")) {
-            $array[] = "width = ".Config::inst()->get("Advertisement", "width")."px";
+        if (Config::inst()->get(Advertisement::class, "width")) {
+            $array[] = "width = ".Config::inst()->get(Advertisement::class, "width")."px";
         }
-        if (Config::inst()->get("Advertisement", "height")) {
-            $array[] = "height = ".Config::inst()->get("Advertisement", "height")."px";
+        if (Config::inst()->get(Advertisement::class, "height")) {
+            $array[] = "height = ".Config::inst()->get(Advertisement::class, "height")."px";
         }
         $count = count($array);
         if ($count == 0) {
@@ -89,13 +105,13 @@ class Advertisement extends DataObject
     );
 
     private static $has_one = array(
-        "AdvertisementImage" => "Image",
-        "LinkedPage" => "SiteTree",
-        "AdditionalImage" => "Image"
+        "AdvertisementImage" => Image::class,
+        "LinkedPage" => SiteTree::class,
+        "AdditionalImage" => Image::class
     );
 
     private static $belongs_many_many = array(
-        "Parents" => "SiteTree",
+        "Parents" => SiteTree::class,
     );
 
     private static $casting = array(
@@ -162,7 +178,7 @@ class Advertisement extends DataObject
         if ($this->AdvertisementImageID) {
             $image = $this->AdvertisementImage();
             if ($image && $image->exists()) {
-                $thumb = $image->setSize(Config::inst()->get("Advertisement", "thumbnail_size"), Config::inst()->get("Advertisement", "thumbnail_size"));
+                $thumb = $image->setSize(Config::inst()->get(Advertisement::class, "thumbnail_size"), Config::inst()->get(Advertisement::class, "thumbnail_size"));
                 if ($thumb) {
                     $s = '
                         <img src="'.$thumb->Link().'" title="'.$thumb->Link().'"/ style="vertical-align: top; display: block; float: left; padding-right: 10px; '.$additionalStyle.' "><div style="width: 100%;">'.$s.'</div><div style="clear: left;"></div>';
@@ -240,7 +256,7 @@ class Advertisement extends DataObject
                 _t("Advertisement.GETCMSFIELDSPARENTID", "only show on ... (leave blank to show on all "
                     .$this->i18n_singular_name()
                     ." pages)"),
-                "SiteTree"
+                SiteTree::class
             );
             /*$callback = $this->callbackFilterFunctionForMultiSelect();
             if($callback) {
@@ -253,7 +269,7 @@ class Advertisement extends DataObject
             $externalLinkField = new TextField($name = "ExternalLink", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINK", "link to external site"))
         );
         $externalLinkField->setRightTitle(_t("Advertisement.GETCMSFIELDSEXTERNALLINK_EXPLANATION", "(e.g. http://www.wikipedia.org) - this will override an internal link"));
-        $fields->addFieldToTab("Root.OptionalLink", TreeDropdownField::create($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = "SiteTree"));
+        $fields->addFieldToTab("Root.OptionalLink", TreeDropdownField::create($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = SiteTree::class));
         if (class_exists("DataObjectSorterController")) {
             //sorted on parent page...
         } else {
@@ -294,8 +310,8 @@ class Advertisement extends DataObject
      */
     protected function callbackFilterFunctionForMultiSelect()
     {
-        $inc = Config::inst()->get("AdvertisementDecorator", "page_classes_with_advertisements");
-        $exc = Config::inst()->get("AdvertisementDecorator", "page_classes_without_advertisements");
+        $inc = Config::inst()->get(AdvertisementDecorator::class, "page_classes_with_advertisements");
+        $exc = Config::inst()->get(AdvertisementDecorator::class, "page_classes_without_advertisements");
         if (is_array($inc) && count($inc)) {
             $string = 'return in_array($obj->class, array(\''.implode("','", $inc).'\'));';
         } elseif (is_array($exc) && count($exc)) {
@@ -329,8 +345,8 @@ class Advertisement extends DataObject
                 if ($imageObject) {
                     if ($imageObject->ID) {
                         $imageObject->Title = Convert::raw2att($this->Title);
-                        $w = Config::inst()->get("Advertisement", "width");
-                        $h = Config::inst()->get("Advertisement", "height");
+                        $w = Config::inst()->get(Advertisement::class, "width");
+                        $h = Config::inst()->get(Advertisement::class, "height");
                         if ($h && $w) {
                             $resizedImage = $imageObject->SetSize($w, $h);
                         } elseif ($h) {

@@ -2,8 +2,13 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-use DataObject;
-use Config;
+
+
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\Advertisements\Model\AdvertisementStyle;
+use SilverStripe\ORM\DataObject;
+
 
 
 /**
@@ -21,7 +26,7 @@ class AdvertisementStyle extends DataObject
     );
 
     private static $has_many = array(
-        "Parent" => "SiteTree"
+        "Parent" => SiteTree::class
     );
 
     private static $array_of_js_file_options = array();
@@ -60,7 +65,7 @@ class AdvertisementStyle extends DataObject
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        if ($a = Config::inst()->get("AdvertisementStyle", "array_of_js_file_options")) {
+        if ($a = Config::inst()->get(AdvertisementStyle::class, "array_of_js_file_options")) {
             if (is_array($a)) {
                 if (count($a)) {
                     foreach ($a as $k => $v) {
