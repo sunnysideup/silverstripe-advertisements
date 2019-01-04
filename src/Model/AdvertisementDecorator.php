@@ -1,5 +1,27 @@
 <?php
 
+namespace Sunnysideup\Advertisements\Model;
+
+use SiteTreeExtension;
+use Requirements;
+use Config;
+use FieldList;
+use Image;
+use CheckboxSetField;
+use GridField;
+use GridFieldConfig_RelationEditor;
+use LiteralField;
+use File;
+use DataObjectSorterController;
+use CheckboxField;
+use Folder;
+use TreeDropdownField;
+use DropdownField;
+use SiteTree;
+use HomePage;
+use Page;
+
+
 /**
  *@author nicolaas [at] sunnysideup.co.nz
  *

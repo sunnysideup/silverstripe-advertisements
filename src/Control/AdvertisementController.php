@@ -1,5 +1,13 @@
 <?php
 
+namespace Sunnysideup\Advertisements\Control;
+
+use Controller;
+use SiteTree;
+use DB;
+use Config;
+
+
 
 class AdvertisementController extends Controller
 {

@@ -1,5 +1,11 @@
 <?php
 
+namespace Sunnysideup\Advertisements\Model;
+
+use DataObject;
+use Config;
+
+
 /**
  * @nicolaas [at] sunnysideup.co.nz
  *

@@ -1,5 +1,21 @@
 <?php
 
+namespace Sunnysideup\Advertisements\Model;
+
+use DataObject;
+use Config;
+use DBField;
+use Image;
+use ReadonlyField;
+use UploadField;
+use TreeMultiselectField;
+use TextField;
+use TreeDropdownField;
+use NumericField;
+use DB;
+use Convert;
+
+
 /* *
  *@author nicolaas[at] sunnysideup.co.nz
  *
