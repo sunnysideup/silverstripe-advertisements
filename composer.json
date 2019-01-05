@@ -22,9 +22,7 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~3.6",
         "sunnysideup/dataobjectsorter": "*",
-        "composer/installers": "^1.6",
         "silverstripe/recipe-cms": "^4.2"
     },
     "extra": []
