@@ -2,18 +2,6 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-
-
-
-
-
-
-
-
-
-
-
-
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\Advertisements\Model\Advertisement;
 use SilverStripe\Assets\Image;
@@ -30,8 +18,6 @@ use Sunnysideup\Advertisements\Model\AdvertisementDecorator;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 
-
-
 /* *
  *@author nicolaas[at] sunnysideup.co.nz
  *
@@ -39,6 +25,8 @@ use SilverStripe\ORM\DataObject;
 
 class Advertisement extends DataObject
 {
+    private static $table_name = 'Advertisement';
+
     /**
      *
      * @var int

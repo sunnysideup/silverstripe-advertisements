@@ -1,9 +1,5 @@
 ---
 Name: advertisements
-Before: 'app/*'
-After:
-    - 'framework/*'
-    - 'cms/*'
 ---
 SiteTree:
   extensions:

@@ -2,23 +2,12 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-
-
-
-
-
-
-
-
-
-
 use DataObjectSorterController;
 
 
 
 
 
-use HomePage;
 use Page;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\Config\Config;
@@ -39,8 +28,6 @@ use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Model\SiteTreeExtension;
-
-
 
 /**
  *@author nicolaas [at] sunnysideup.co.nz
@@ -303,11 +290,7 @@ class AdvertisementDecorator extends SiteTreeExtension
         } elseif ($this->owner->URLSegment != "home") {
             $parent = SiteTree::get()->where("URLSegment = 'home' AND \"ClassName\" <> 'RedirectorPage'")->First();
             if (!$parent) {
-                if (class_exists("HomePage")) {
-                    $parent = HomePage::get()->First();
-                } else {
-                    $parent = Page::get()->filter(array("URLSegment" => "home"))->First();
-                }
+                $parent = Page::get()->filter(array("URLSegment" => "home"))->First();
             }
         }
         if ($parent) {

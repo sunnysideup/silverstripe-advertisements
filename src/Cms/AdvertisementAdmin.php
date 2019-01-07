@@ -2,11 +2,8 @@
 
 namespace Sunnysideup\Advertisements\Cms;
 
-
 use Sunnysideup\Advertisements\Model\Advertisement;
 use SilverStripe\Admin\ModelAdmin;
-
-
 
 /**
  * @author: Nicolaas [at] sunnysideup.co.nz

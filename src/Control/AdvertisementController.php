@@ -2,18 +2,11 @@
 
 namespace Sunnysideup\Advertisements\Control;
 
-
-
-
-
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\DB;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\Advertisements\Model\Advertisement;
 use SilverStripe\Control\Controller;
-
-
-
 
 class AdvertisementController extends Controller
 {

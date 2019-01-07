@@ -2,14 +2,10 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-
-
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\Advertisements\Model\AdvertisementStyle;
 use SilverStripe\ORM\DataObject;
-
-
 
 /**
  * @nicolaas [at] sunnysideup.co.nz
@@ -20,6 +16,8 @@ use SilverStripe\ORM\DataObject;
 
 class AdvertisementStyle extends DataObject
 {
+    private static $table_name = 'AdvertisementStyle';
+
     private static $db = array(
         "Title" => "Varchar(100)",
         "FileLocation" => "Varchar(100)"
