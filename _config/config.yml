@@ -1,15 +1,15 @@
 ---
 Name: advertisements
 ---
-SiteTree:
+SilverStripe\CMS\Model\SiteTree:
   extensions:
-    - AdvertisementDecorator
+    - Sunnysideup\Advertisements\Model\AdvertisementDecorator
 
 
 ---
 Only:
-  classexists: 'DataObjectSorterDOD'
+  classexists: 'Sunnysideup\DataobjectSorter\DataObjectSorterDOD'
 ---
-Advertisement:
+Sunnysideup\Advertisements\Model\AdvertisementDecorator:
   extensions:
-    - DataObjectSorterDOD
+    - Sunnysideup\DataobjectSorter\DataObjectSorterDOD

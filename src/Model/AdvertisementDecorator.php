@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\Advertisements\Model;
 
-use DataObjectSorterController;
+use Sunnysideup\DataobjectSorter\DataObjectSorterDOD;
 
 
 
