@@ -3,4 +3,4 @@ Name: advertisementsroutes
 ---
 SilverStripe\Control\Director:
   rules:
-    'advertisements//$Action/$ID' : 'AdvertisementController'
+    'advertisements//$Action/$ID' : 'Sunnysideup\Advertisements\Control\AdvertisementController'

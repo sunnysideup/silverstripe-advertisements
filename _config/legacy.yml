@@ -1,0 +1,4 @@
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    AdvertisementStyle: Sunnysideup\Advertisements\Model\AdvertisementStyle
+    Advertisement: Sunnysideup\Advertisements\Model\Advertisement
