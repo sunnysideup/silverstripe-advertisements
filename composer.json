@@ -25,5 +25,9 @@
         "sunnysideup/dataobjectsorter": "*",
         "silverstripe/recipe-cms": "^4.2"
     },
-    "extra": []
+    "extra": {
+        "expose": [
+            "client"
+        ]
+    }
 }

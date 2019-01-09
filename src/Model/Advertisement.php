@@ -166,7 +166,11 @@ class Advertisement extends DataObject
         if ($this->AdvertisementImageID) {
             $image = $this->AdvertisementImage();
             if ($image && $image->exists()) {
-                $thumb = $image->setSize(Config::inst()->get(Advertisement::class, "thumbnail_size"), Config::inst()->get(Advertisement::class, "thumbnail_size"));
+                $size = Config::inst()->get(Advertisement::class, "thumbnail_size");
+                $thumb = $image->Fit(
+                    $size,
+                    $size
+                );
                 if ($thumb) {
                     $s = '
                         <img src="'.$thumb->Link().'" title="'.$thumb->Link().'"/ style="vertical-align: top; display: block; float: left; padding-right: 10px; '.$additionalStyle.' "><div style="width: 100%;">'.$s.'</div><div style="clear: left;"></div>';
@@ -336,7 +340,7 @@ class Advertisement extends DataObject
                         $w = Config::inst()->get(Advertisement::class, "width");
                         $h = Config::inst()->get(Advertisement::class, "height");
                         if ($h && $w) {
-                            $resizedImage = $imageObject->SetSize($w, $h);
+                            $resizedImage = $imageObject->Fit($w, $h);
                         } elseif ($h) {
                             $resizedImage = $imageObject->SetHeight($h);
                         } elseif ($w) {
