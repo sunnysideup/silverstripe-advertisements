@@ -342,9 +342,9 @@ class Advertisement extends DataObject
                         if ($h && $w) {
                             $resizedImage = $imageObject->Fit($w, $h);
                         } elseif ($h) {
-                            $resizedImage = $imageObject->SetHeight($h);
+                            $resizedImage = $imageObject->ScaleHeight($h);
                         } elseif ($w) {
-                            $resizedImage = $imageObject->SetWidth($w);
+                            $resizedImage = $imageObject->ScaleWidth($w);
                         } else {
                             $resizedImage = $imageObject;
                         }
