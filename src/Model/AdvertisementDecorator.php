@@ -195,7 +195,7 @@ class AdvertisementDecorator extends SiteTreeExtension
                         Folder::class
                     )
                 );
-                $treeDropdownField->setRightTitle($txt);
+                $treeDropdownField->setDescription($txt);
             }
 
             $styles = AdvertisementStyle::get();
@@ -210,7 +210,7 @@ class AdvertisementDecorator extends SiteTreeExtension
                         $list
                     )
                 );
-                $selectStyleField->setRightTitle(_t("AdvertisementDecorator.STYLECREATED_EXPLANATION", "Styles are created by your developer"));
+                $selectStyleField->setDescription(_t("AdvertisementDecorator.STYLECREATED_EXPLANATION", "Styles are created by your developer"));
             }
 
 

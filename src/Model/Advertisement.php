@@ -233,7 +233,7 @@ class Advertisement extends DataObject
 
         $fields->addFieldToTab("Root.Main", ReadonlyField::create("Link", 'Calculated Link'));
         $fields->addFieldToTab("Root.Main", $mainImageField = new UploadField($name = "AdvertisementImage", $title = $this->i18n_singular_name()));
-        $mainImageField->setRightTitle(self::recommended_image_size_statement());
+        $mainImageField->setDescription(self::recommended_image_size_statement());
         $fields->addFieldToTab(
             "Root.Main",
             $additionalImageField = UploadField::create(
@@ -241,7 +241,7 @@ class Advertisement extends DataObject
                 $title = $this->i18n_singular_name()." "._t("Advertisement.ADDITIONAL_IMAGE", "additional image")
             )
         );
-        $additionalImageField->setRightTitle(self::recommended_image_size_statement());
+        $additionalImageField->setDescription(self::recommended_image_size_statement());
         if ($this->ID) {
             $treeField = TreeMultiselectField::create(
                 "Parents",
@@ -260,7 +260,7 @@ class Advertisement extends DataObject
             "Root.OptionalLink",
             $externalLinkField = new TextField($name = "ExternalLink", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINK", "link to external site"))
         );
-        $externalLinkField->setRightTitle(_t("Advertisement.GETCMSFIELDSEXTERNALLINK_EXPLANATION", "(e.g. http://www.wikipedia.org) - this will override an internal link"));
+        $externalLinkField->setDescription(_t("Advertisement.GETCMSFIELDSEXTERNALLINK_EXPLANATION", "(e.g. http://www.wikipedia.org) - this will override an internal link"));
         $fields->addFieldToTab("Root.OptionalLink", TreeDropdownField::create($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = SiteTree::class));
         if (class_exists("DataObjectSorterController")) {
             //sorted on parent page...
@@ -272,7 +272,7 @@ class Advertisement extends DataObject
                     _t("Advertisement.SORT", "Sort index number")
                 )
             );
-            $sortField->setRightTitle(_t("Advertisement.SORT_EXPLANATION", "the lower the number, the earlier it shows"));
+            $sortField->setDescription(_t("Advertisement.SORT_EXPLANATION", "the lower the number, the earlier it shows"));
         }
         $fields->removeFieldFromTab("Root.Main", "AlternativeSortNumber");
 

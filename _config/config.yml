@@ -5,6 +5,9 @@ SilverStripe\CMS\Model\SiteTree:
   extensions:
     - Sunnysideup\Advertisements\Model\AdvertisementDecorator
 
+SilverStripe\Admin\LeftAndMain:
+    extra_requirements_css:
+        - 'sunnysideup/advertisements: client/css/AdvertisementsCMS.css'
 
 ---
 Only:
