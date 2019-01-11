@@ -17,7 +17,8 @@ use SilverStripe\ORM\DB;
 use Sunnysideup\Advertisements\Model\AdvertisementDecorator;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
-
+use Sunnysideup\Advertisements\Control\AdvertisementController;
+use Sunnysideup\DataobjectSorter\DataObjectSorterController;
 /* *
  *@author nicolaas[at] sunnysideup.co.nz
  *
@@ -262,7 +263,7 @@ class Advertisement extends DataObject
         );
         $externalLinkField->setDescription(_t("Advertisement.GETCMSFIELDSEXTERNALLINK_EXPLANATION", "(e.g. http://www.wikipedia.org) - this will override an internal link"));
         $fields->addFieldToTab("Root.OptionalLink", TreeDropdownField::create($name = "LinkedPageID", $title = _t("Advertisement.GETCMSFIELDSEXTERNALLINKID", "link to a page on this website"), $sourceObject = SiteTree::class));
-        if (class_exists("DataObjectSorterController")) {
+        if (class_exists(DataObjectSorterController::class)) {
             //sorted on parent page...
         } else {
             $fields->addFieldToTab(

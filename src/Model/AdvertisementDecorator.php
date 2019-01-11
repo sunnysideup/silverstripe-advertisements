@@ -3,7 +3,7 @@
 namespace Sunnysideup\Advertisements\Model;
 
 use Sunnysideup\DataobjectSorter\DataObjectSorterDOD;
-
+use Sunnysideup\DataobjectSorter\DataObjectSorterController;
 
 
 
@@ -18,7 +18,11 @@ use Sunnysideup\Advertisements\Model\Advertisement;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\GridField\GridFieldPageCount;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Assets\File;
 use SilverStripe\Forms\LiteralField;
@@ -28,6 +32,7 @@ use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Model\SiteTreeExtension;
+use SilverStripe\ORM\FieldType\DBField;
 
 /**
  *@author nicolaas [at] sunnysideup.co.nz
@@ -108,68 +113,95 @@ class AdvertisementDecorator extends SiteTreeExtension
         if ($this->classHasAdvertisements($this->owner->ClassName)  && $this->owner->exists()) {
             $tabName = $this->MyTabName();
             //advertisements shown...
-            $where = '1 = 1';
-            if ($this->owner->AdvertisementsFolderID) {
-                $images = Image::get()->filter("ParentID", $this->owner->AdvertisementsFolderID);
-                if ($images->count()) {
-                    $where = "\"AdvertisementImageID\" IN (".implode(",", $images->column("ID")).")";
-                } else {
-                    $where = " 1 = 2";
+            if(! $this->owner->UseParentAdvertisements) {
+                $where = '1 = 1';
+                if ($this->owner->AdvertisementsFolderID) {
+                    $images = Image::get()->filter("ParentID", $this->owner->AdvertisementsFolderID);
+                    if ($images->count()) {
+                        $where = "\"AdvertisementImageID\" IN (".implode(",", $images->column("ID")).")";
+                    } else {
+                        $where = " 1 = 2";
+                    }
                 }
-            }
 
-            $source = Advertisement::get();
-            if ($source && $source->count()) {
-                $newSource = [];
-                foreach ($source as $ad) {
-                    $newSource[$ad->ID] = $ad->getFullTitle('width: 75px!important;');
+                $source = Advertisement::get();
+                if ($source && $source->count()) {
+                    $newSource = [];
+                    foreach ($source as $ad) {
+                        $newSource[$ad->ID] = $ad->getFullTitle('width: 150px!important;');
+                    }
+                    $fields->addFieldToTab(
+                        $tabName,
+                        CheckboxSetField::create(
+                            'Advertisements',
+                            'Select '.Config::inst()->get(Advertisement::class, "plural_name"),
+                            $newSource
+                        )
+                    );
                 }
-                $fields->addFieldToTab($tabName, CheckboxSetField::create(
-                    'Advertisements',
-                    'Select '.Config::inst()->get(Advertisement::class, "plural_name"),
-                    $newSource
-                ));
-            }
 
-            //$advertisementsCount = DB::query("SELECT COUNT(ID) FROM \"Advertisement\" $whereDB ;")->value();
-            $advertisements = $this->owner->Advertisements()->where($where);
-            $txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get(Advertisement::class, "plural_name"));
-            $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
-            $txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get(Advertisement::class, "plural_name"));
-            $advertisementsGridField = new GridField('AdvertisementsList', $txt, $this->owner->Advertisements(), GridFieldConfig_RelationEditor::create());
-            $fields->addFieldToTab($tabName, $advertisementsGridField);
-            if (Config::inst()->get(Advertisement::class, "resize_images") == 'no') {
-                $totalSize = 0;
-                foreach ($this->owner->Advertisements() as $advertisement) {
-                    $totalSize += $advertisement->AdvertisementImage()->getAbsoluteSize();
-                }
-                $seconds = round(($totalSize + 1) / 524288)    ;
-                $fields->addFieldToTab($tabName, new LiteralField("TotalSize", '<p><em>Total download size: '.File::format_size($totalSize).', good reception 3G network download time less than ~'.($seconds+1).' seconds.</em></p>'));
-            }
-            if (class_exists("DataObjectSorterController")) {
-                $shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
-                if ($shownAdvertisements) {
-                    $array = $shownAdvertisements->column("ID");
-                    $idString = implode(",", $array);
-                    $link = DataObjectSorterController::popup_link(Advertisement::class, $filterField = "ID", $filterValue = $idString, $linkText = "sort ".Config::inst()->get(Advertisement::class, "plural_name"), $titleField = "FullTitle");
-                    $fields->addFieldToTab($tabName, new LiteralField("AdvertisementsSorter", $link));
-                }
-            }
-            if ($advertisements->count()) {
-            } else {
-                $txt = sprintf(
-                    _t("AdvertisementDecorator.CREATE", '<p>Please <a href="admin/%1$s/">create %2$s</a> on the <a href="admin/%1$s/">%3$s tab</a> first, or see below on how to create %2$s from a folder.</p>'),
-                    Config::inst()->get(AdvertisementAdmin::class, "url_segment"),
-                    Config::inst()->get(Advertisement::class, "plural_name"),
-                    Config::inst()->get(AdvertisementAdmin::class, "menu_title")
+                $fields->addFieldToTab(
+                    $tabName,
+                    LiteralField::create(
+                        'Separator1',
+                        '<hr /><hr />'
+                    )
                 );
-                $fields->addFieldToTab($tabName, new LiteralField("AdvertisementsHowToCreate", $txt));
+
+                //$advertisementsCount = DB::query("SELECT COUNT(ID) FROM \"Advertisement\" $whereDB ;")->value();
+                $advertisements = $this->owner->Advertisements()->where($where);
+                $txt = sprintf(_t("AdvertisementDecorator.ACTUAL", 'Current %1$s Shown'), Config::inst()->get(Advertisement::class, "plural_name"));
+                $fields->addFieldToTab($tabName, $this->MyHeaderField($txt));
+                $txt = sprintf(_t("AdvertisementDecorator.SELECT", 'Select %1$s to show ... '), Config::inst()->get(Advertisement::class, "plural_name"));
+                $advertisementsGridField = new GridField('AdvertisementsList', $txt, $this->owner->Advertisements(), $config = GridFieldConfig_RelationEditor::create());
+                $config->removeComponentsByType(
+                    [
+                        GridFieldAddNewButton::class,
+                        GridFieldAddExistingAutocompleter::class,
+                        GridFieldPageCount::class,
+                        GridFieldToolbarHeader::class
+                    ]
+                );
+                $fields->addFieldToTab($tabName, $advertisementsGridField);
+                if (Config::inst()->get(Advertisement::class, "resize_images") == 'no') {
+                    $totalSize = 0;
+                    foreach ($this->owner->Advertisements() as $advertisement) {
+                        $totalSize += $advertisement->AdvertisementImage()->getAbsoluteSize();
+                    }
+                    $seconds = round(($totalSize + 1) / 524288)    ;
+                    $fields->addFieldToTab($tabName, new LiteralField("TotalSize", '<p><em>Total download size: '.File::format_size($totalSize).', good reception 3G network download time less than ~'.($seconds+1).' seconds.</em></p>'));
+                }
+                if (class_exists(DataObjectSorterController::class)) {
+                    $shownAdvertisements = $this->owner->getManyManyComponents('Advertisements');
+                    if ($shownAdvertisements) {
+                        $array = $shownAdvertisements->column("ID");
+                        $idString = implode(",", $array);
+                        $link = DataObjectSorterController::popup_link(Advertisement::class, $filterField = "ID", $filterValue = $idString, $linkText = "Sort ".Config::inst()->get(Advertisement::class, "plural_name"), $titleField = "FullTitle");
+                        $fields->addFieldToTab($tabName, new LiteralField("AdvertisementsSorter", $link));
+                    }
+                }
+                if ($advertisements->count()) {
+                } else {
+                    $txt = sprintf(
+                        _t("AdvertisementDecorator.CREATE", '<p>Please create <a href="admin/%1$s/">%2$s</a> on the <a href="admin/%1$s/">%3$s tab</a> first, or see below on how to create %2$s from a folder.</p>'),
+                        Config::inst()->get(AdvertisementAdmin::class, "url_segment"),
+                        Config::inst()->get(Advertisement::class, "plural_name"),
+                        Config::inst()->get(AdvertisementAdmin::class, "menu_title")
+                    );
+                    $fields->addFieldToTab($tabName, new LiteralField("AdvertisementsHowToCreate", $txt));
+                }
             }
             if ($parent = $this->advertisementParent()) {
-                $txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'OR  ... use %1$s from  <i>%2$s</i>.'), Config::inst()->get(Advertisement::class, "plural_name"), $parent->Title);
-                $fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", $txt));
+                $txt = sprintf(_t("AdvertisementDecorator.ORUSE", 'Use %1$s from  <i>%2$s</i>.'), Config::inst()->get(Advertisement::class, "plural_name"), $parent->Title);
+                $fields->addFieldToTab($tabName, new CheckboxField("UseParentAdvertisements", DBField::create_field('HTMLText', $txt)));
             }
-
+            $fields->addFieldToTab(
+                $tabName,
+                LiteralField::create(
+                    'Separator2',
+                    '<hr /><hr />'
+                )
+            );
 
             $txt = _t('AdvertisementDecorator.ADVANCED', 'Advanced');
             $fields->addFieldToTab($tabName, $this->MyHeaderFieldLarge($txt));
@@ -282,7 +314,7 @@ class AdvertisementDecorator extends SiteTreeExtension
         }
     }
 
-    protected function advertisementParent()
+    public function advertisementParent()
     {
         $parent = null;
         if ($this->owner->ParentID) {

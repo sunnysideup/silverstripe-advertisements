@@ -13,6 +13,6 @@ SilverStripe\Admin\LeftAndMain:
 Only:
   classexists: 'Sunnysideup\DataobjectSorter\DataObjectSorterDOD'
 ---
-Sunnysideup\Advertisements\Model\AdvertisementDecorator:
+Sunnysideup\Advertisements\Model\Advertisement:
   extensions:
     - Sunnysideup\DataobjectSorter\DataObjectSorterDOD
